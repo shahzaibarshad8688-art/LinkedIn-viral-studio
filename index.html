@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>LinkedIn Viral Studio Pro v2</title>
+<title>LinkedIn Viral Studio Pro v3</title>
 <style>
 :root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#f6f7fb;--card:#fff;--tx:#0f172a;--mut:#64748b;--ac:#2563eb;--bd:#e2e8f0;--ub:#2563eb}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b1020;--card:#151b2e;--tx:#e8ecf5;--mut:#94a3b8;--bd:#263049;--ub:#3b6cf0}}
@@ -42,10 +42,20 @@ input[type=text],input[type=password]{width:100%;font:inherit;border:1px solid v
 
 .box select{width:100%;font:inherit;border:1px solid var(--bd);background:var(--bg);color:var(--tx);border-radius:10px;padding:9px 12px}
 .m canvas{max-width:100%}
+.gbox{max-width:760px}.gtabs{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0 4px}
+.sec{border:1px solid var(--bd);border-radius:12px;padding:12px;margin-top:10px}.sec h4{margin:0 0 8px;font-size:14px}
+.mut{color:var(--mut);font-size:12px}.tip{font-size:12px;color:var(--mut);margin:2px 0}
+.box textarea,.sec textarea{width:100%;font:inherit;font-size:14px;line-height:1.5}
+.sc{display:inline-flex;align-items:center;font-weight:700;border-radius:999px;padding:4px 12px;font-size:12px}
+.idea{display:flex;flex-wrap:wrap;gap:8px;align-items:center;border-bottom:1px solid var(--bd);padding:10px 0}
+.tag{font-size:11px;border:1px solid var(--bd);border-radius:999px;padding:2px 9px;color:var(--mut);white-space:nowrap}
+.pe{outline:none;cursor:text}.pe:focus{border-color:var(--ac)!important;border-style:solid!important}
+.bar select,input.dtl{font:inherit;font-size:13px;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:999px;padding:6px 10px;max-width:100%}
+header{flex-wrap:wrap}
 </style>
 </head>
 <body>
-<header><div><b>LinkedIn Viral Studio</b><br><small>Smart Content Generator · Local Visual Generator</small></div><div class="row" style="margin:0"><button id="tb" class="p">Teach Video</button><button id="st">Settings</button><button id="th">Theme</button></div></header>
+<header><div><b>LinkedIn Viral Studio</b><br><small>Viral posts · Client hunting · Smart comments</small></div><div class="row" style="margin:0"><button id="gh" class="p">🚀 Growth Hub</button><button id="tb">Teach Video</button><button id="st">Settings</button><button id="th">Theme</button></div></header>
 <div id="chat"></div>
 <div class="bar" id="bar"></div>
 <div class="in"><textarea id="q" placeholder="Topic likho: e.g. What is AI Today"></textarea><button class="p send" id="go">Send</button></div>
@@ -768,6 +778,334 @@ $('#sot').onclick=async()=>{const m=$('#otm'),base=($('#sou').value.trim()||'htt
 loadX();bar();
 /*OVERRIDES_END*/
 
+</script>
+<div class="panel" id="gp"><div class="box gbox">
+<div class="row" style="justify-content:space-between;align-items:center;margin:0"><h3 style="margin:0">🚀 Growth Hub</h3><button id="gx">Close</button></div>
+<div class="gtabs" id="gtabs"></div>
+<div id="gbody"></div>
+</div></div>
+<script>
+/*V3_START — Growth engine: brand profile, human-voice viral formulas, viral score, comment assistant, client hunter, scheduler*/
+const BR_DEF={niche:'Web Development & AI Automation',services:'website development, AI automation, custom web apps',audience:'startup founders and small business owners',offer:'',proof:'',tone:'friendly expert',goal:'leads',kw:'HELP',pillars:'AI for small businesses\nWebsites that bring clients\nAutomation ideas that save time\nFreelancing and client lessons\nWeb development tips',auto:false};
+let BR=Object.assign({},BR_DEF,LS.get('vs_brand')||{});
+let FORMULA=LS.get('vs_formula')||'auto',ONE_F=null,ANGLE='',QU=LS.get('vs_queue')||[],GT='profile';
+const FORMS=[['auto','Auto (goal ke mutabiq)'],['story','📖 Story'],['contrarian','🔥 Contrarian'],['listicle','📋 Listicle'],['howto','🛠 How-to steps'],['mistakes','⚠️ Mistakes to avoid'],['case','📈 Client case study'],['myth','🧠 Myth vs Fact'],['beforeafter','🔄 Before / After'],['magnet','🧲 Lead magnet'],['bts','🎬 Behind the scenes'],['opinion','💬 Debate question']];
+const FN=k=>(FORMS.find(x=>x[0]===k)||['',k])[1];
+const FDESC={story:'Personal story: a relatable moment, the turning point, the lesson, and how it applies to the reader. Do not invent fake clients or numbers; tell it as your own general experience or a pattern you keep seeing.',
+contrarian:'Contrarian take: challenge a common belief about the topic with a bold but defensible opinion, explain why, then give the better alternative.',
+listicle:'List post: 5 to 7 specific, non-obvious tips, each 1 to 2 lines.',
+howto:'Step-by-step how-to: a simple framework of 4 to 6 steps the reader can apply today.',
+mistakes:'Mistakes to avoid: 4 or 5 common mistakes the ideal client makes, each followed by the fix.',
+case:'Case-study style: problem, what was done, outcome, lesson. Only use real results from PROOF; if there is no proof, describe a typical scenario clearly framed as an example, with no numbers.',
+myth:'Myth vs fact: 3 or 4 myths about the topic, each followed by the reality.',
+beforeafter:'Before vs after: contrast the painful "before" with the better "after", then explain the bridge (how to get there).',
+magnet:'Lead magnet: tease a free checklist/guide/advice, give 3 quick wins from it, and ask readers to comment the KEYWORD to receive it.',
+bts:'Behind the scenes: how you actually work, your process and decisions, showing expertise transparently.',
+opinion:'Discussion starter: short post with an either/or question and 2 to 4 options, designed to get many comments.'};
+const GOALS=[['reach','🌍 Reach'],['leads','💼 Clients'],['authority','🏆 Authority']];
+const GDESC={reach:'Maximum reach: optimise for comments, saves and reposts; relatable angle; end with an easy, specific question.',leads:'Attract clients: speak directly to the ideal client\'s pain, prove expertise, soft-sell. End with a clear low-friction CTA (comment the keyword or DM). Never pushy.',authority:'Build authority: deep, specific insight that shows real expertise; end by inviting experiences and a follow.'};
+const GPOOL={reach:['contrarian','story','listicle','myth','opinion','beforeafter'],leads:['case','magnet','mistakes','beforeafter','howto','bts'],authority:['howto','listicle','myth','bts','story','contrarian']};
+const VOICES=['conversational, like you are talking to one person over coffee','crisp and punchy, short lines, zero filler','reflective storyteller with one small, vivid real-life detail','a senior practitioner explaining to a smart friend','direct, no-nonsense advice from experience','calm and thoughtful, slightly witty'];
+const OPENERS=['a surprising observation','a short confession','a bold one-line opinion','a specific moment or scene','a sharp question','a counter-intuitive fact framed as your view'];
+const autoForm=()=>fresh(GPOOL[BR.goal]||GPOOL.leads,'form'+BR.goal);
+const seg=s=>String(s||'').split(/,|\n/).map(x=>x.trim()).filter(Boolean);
+const pil=()=>String(BR.pillars||'').split('\n').map(x=>x.trim()).filter(Boolean);
+const LNm=()=>({en:'English',ru:'Roman Urdu (Urdu written in English letters, natural Pakistani style)',ur:'Urdu script'}[lang]);
+function mk(t,a,...k){const e=document.createElement(t);if(a)for(const x in a){const v=a[x];if(x==='on'){for(const ev in v)e.addEventListener(ev,v[ev])}else if(x==='style')e.style.cssText=v;else if(x==='className')e.className=v;else if(x in e)e[x]=v;else e.setAttribute(x,v)}k.flat().forEach(c=>{if(c==null||c===false)return;e.appendChild(c instanceof Node?c:document.createTextNode(String(c)))});return e}
+const fldx=(l,el)=>mk('div',null,mk('label',null,l),el);
+const inpx=(v,ph,st)=>mk('input',{type:'text',value:v||'',placeholder:ph||'',style:st||''});
+const tax=(v,ph,rows)=>mk('textarea',{value:v||'',placeholder:ph||'',rows:rows||3,style:'width:100%;height:auto;flex:none'});
+const selx=(v,opts)=>{const s=mk('select');opts.forEach(([k,l])=>s.appendChild(mk('option',{value:k},l)));s.value=v;return s};
+
+/* ---------- AI ---------- */
+async function callGemini(pr){if(!cfg.key)throw new Error('Gemini key nahi hai');const r=await tfetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(cfg.model)}:generateContent?key=${encodeURIComponent(cfg.key)}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:pr}]}],generationConfig:{responseMimeType:'application/json',temperature:1.05,topP:.95,maxOutputTokens:8192}})},90000);
+if(!r.ok){let m='HTTP '+r.status;try{const e=await r.json();if(e.error&&e.error.message)m+=': '+e.error.message.slice(0,140)}catch(_){}throw new Error(m)}const j=await r.json(),c=(j.candidates||[])[0];if(!c||!c.content||!c.content.parts)throw new Error('khali jawab ('+((c&&c.finishReason)||'blocked')+')');return c.content.parts.map(x=>x.text||'').join('')}
+async function llmJSON(pr){const order=eng==='local'?[]:eng==='gemini'?['gemini']:eng==='ollama'?['ollama']:[cfg.key?'gemini':null,'ollama'].filter(Boolean);let last=null;for(const e of order){try{return jparse(e==='gemini'?await callGemini(pr):await callOllama(pr))}catch(err){last=err}}throw last||new Error('AI engine set nahi (Settings mein Gemini key lagayein)')}
+function v3Prompt(t,f,ang,avoid){const voice=fresh(VOICES,'voice'),open=fresh(OPENERS,'open');return `You are a top LinkedIn ghostwriter. Your posts sound 100% human, regularly reach 100k+ people and bring inbound clients to freelancers, consultants and agencies. Readers must never feel the post was written by AI or from a template.
+
+AUTHOR
+- Name: ${cfg.name}
+- Headline: ${cfg.role||'-'}
+- Niche: ${BR.niche||'-'}
+- Services: ${BR.services||'-'}
+- Ideal client (write FOR them): ${BR.audience||'-'}
+- Offer for CTA: ${BR.offer||'none given, use a soft "DM me" invitation'}
+- Real proof you may mention: ${BR.proof||'NONE. Do not claim any client results, numbers or names.'}
+- Comment keyword for CTA: ${(BR.kw||'HELP').toUpperCase()}
+- Tone: ${BR.tone||'friendly expert'}
+
+THIS POST
+- Topic: "${t}"${ang?`\n- Specific angle: "${ang}"`:''}
+- Format: ${FDESC[f]||FDESC.listicle}
+- Goal: ${GDESC[BR.goal]||GDESC.leads}
+- Voice for this post: ${voice}
+- Open with: ${open}
+- Language: ${LNm()}
+
+HUMAN VOICE RULES (most important)
+- Write like a real practitioner, not a content machine. Use contractions, vary sentence length, allow one short fragment.
+- Include at least one concrete, specific detail (a tool, a small scene, a real-feeling example, a precise step). Generic advice is forbidden.
+- Do not use em dashes. Max 3 emojis in the whole post, and never one on every line.
+- Banned AI phrases: "In today's fast-paced world", "game-changer", "delve", "unlock", "leverage", "elevate", "navigate", "landscape", "seamless", "robust", "harness", "Here's the thing", "Let that sink in", "Let's dive in", "In conclusion", "It's not just X, it's Y", "buckle up". No rhetorical groups of three in every paragraph.
+- Do not reuse a fixed structure. Choose the layout that fits this exact topic.
+
+LINKEDIN ALGORITHM RULES
+1. Line 1 is the hook: max 12 words. Line 1 + line 2 under 200 characters so they work before "...see more".
+2. One idea per line, 1-2 line paragraphs, lots of white space.
+3. 1,100 to 1,900 characters total.
+4. Talk to the ideal client's real pains and wins. "You" more than "I".
+5. No links in the post. Never invent statistics, studies, client names or results.
+6. End with a CTA matched to the goal, optional one-line "P.S." for leads, then 3 to 5 relevant hashtags on the final line.
+7. Must be clearly different from these recent headlines: ${avoid||'none'}.
+
+Also art-direct a poster image for the post.
+
+Return ONLY valid JSON with exactly these keys:
+{"headline":"poster headline, max 9 words","points":["6 short takeaways from the post, each under 80 characters"],"labels":["8 labels of 1-2 words"],"post":"the full post text with line breaks and hashtags","hooks":["3 alternative first lines in different styles (curiosity, bold claim, question)"],"first_comment":"comment the author posts under their own post right after publishing: one bonus tip or insight, under 250 characters, no hashtags","mood":"one of electric|sunset|aurora|mono|candy|forest|gold|ocean|neon|paper","hue":0,"stat":{"value":"short big figure that is certainly true, e.g. '5 steps'","label":"caption under 60 characters"},"quote":"one memorable original line under 100 characters","image_prompt":"English description of an abstract or symbolic cinematic background for this topic, no text, no people, no logos"}`}
+async function aiText3(msg,which,f,ang){const t=topicOf(msg),avoid=(LS.get('vs_used')||[]).slice(-8).join(' | '),pr=v3Prompt(t,f,ang,avoid);
+const o=jparse(which==='gemini'?await callGemini(pr):await callOllama(pr));
+if(!o||typeof o.post!=='string'||o.post.length<200||!o.headline)throw new Error('AI ka jawab adhura tha');
+const pts=(Array.isArray(o.points)?o.points:[]).map(x=>String(x).slice(0,110)).filter(Boolean),lb=(Array.isArray(o.labels)?o.labels:[]).map(x=>String(x).slice(0,22)).filter(Boolean);
+const st=o.stat&&o.stat.value?{value:String(o.stat.value).slice(0,12),label:String(o.stat.label||'').slice(0,70)}:null;
+const u=LS.get('vs_used')||[];u.push(String(o.headline).slice(0,80));LS.set('vs_used',u.slice(-14));
+const txt=o.post.replace(/\\n/g,'\n').replace(/\s*—\s*/g,', ').trim();
+return{text:txt,d:{headline:String(o.headline).slice(0,90),points:pts,labels:lb.length>=8?lb.slice(0,8):null,quote:o.quote?String(o.quote).slice(0,130):null,stat:st},art:{mood:String(o.mood||'').toLowerCase(),hue:o.hue},imgp:o.image_prompt?String(o.image_prompt).slice(0,300):null,
+hooks:(Array.isArray(o.hooks)?o.hooks:[]).map(x=>String(x).trim()).filter(Boolean).slice(0,3),fc:o.first_comment?String(o.first_comment).slice(0,400):''}}
+
+/* ---------- Local (offline) human-style generator, many variants ---------- */
+const LX={
+en:{h:{story:t=>[`I got ${t} wrong for a long time.`,`The day ${t} finally clicked for me.`,`Nobody warned me about this side of ${t}.`,`I almost gave up on ${t}. Glad I didn't.`],
+contrarian:t=>[`Unpopular opinion: most ${t} advice is backwards.`,`${cap(t)} isn't the problem. The approach is.`,`Stop doing ${t} the "normal" way.`,`Hot take: you don't need more ${t} tips.`],
+listicle:(t,n)=>[`${n} ${t} lessons I wish I knew sooner:`,`${cap(t)}: ${n} things that actually move the needle.`,`Save this. ${n} practical ${t} tips.`,`If I had to start ${t} again, I'd do these ${n} things.`],
+howto:(t,n)=>[`How to get ${t} right in ${n} simple steps:`,`The simple ${t} process I keep coming back to:`,`${cap(t)}, made simple. Steal this process:`,`Here's how I'd fix ${t} in a week.`],
+mistakes:(t,n,A)=>[`${n} ${t} mistakes that quietly cost ${A} money.`,`Struggling with ${t}? Check these ${n} mistakes first.`,`Most ${A} make these ${t} mistakes.`,`I made every one of these ${t} mistakes.`],
+case:t=>[`What fixing ${t} actually looks like:`,`A typical ${t} problem, and how I'd solve it.`,`From stuck to moving: a ${t} breakdown.`,`Here's a ${t} problem I see almost every week.`],
+myth:(t,n)=>[`${n} ${t} myths that need to go.`,`Myth vs fact: the ${t} edition.`,`You've probably been told these ${t} myths.`,`Things people believe about ${t} that just aren't true:`],
+beforeafter:t=>[`Before vs after getting ${t} right:`,`${cap(t)}: where most people are vs where they could be.`,`The ${t} gap nobody talks about.`,`What changes when ${t} is done properly:`],
+magnet:t=>[`I turned my best ${t} advice into one checklist.`,`Want my ${t} checklist? Read this first.`,`The ${t} checklist I wish every client had.`,`I'm giving away my ${t} checklist.`],
+bts:t=>[`Here's exactly how I approach ${t}.`,`Behind the scenes of my ${t} process:`,`No secrets. My real ${t} workflow.`,`People ask how I handle ${t}. Here it is.`],
+opinion:t=>[`Quick question about ${t}:`,`${cap(t)}: which side are you on?`,`Settle this ${t} debate for me.`,`Genuinely curious what you think about ${t}.`]},
+tips:(t,A)=>[`Pick one clear outcome for ${t} before touching any tool.`,`Talk to 3 real ${A} before you build anything.`,`Ship a rough version first. Feedback beats guessing.`,`Track what affects revenue, not likes.`,`Automate the boring, repeated parts first.`,`Write down what works and turn it into a checklist.`,`Every 30 days, cut one thing that isn't working.`,`Copy the process of people 2 steps ahead, not 20.`,`Simple and done beats clever and stuck.`,`Block 45 minutes a day for it. Same time, every day.`,`Ask your last 3 customers why they said yes.`,`Fix the slowest step first. Everything else waits.`],
+mist:[['Starting without a clear goal.','Define one measurable outcome first.'],['Copying big brands without their budget.','Do what fits your stage and resources.'],['Chasing every new trend.','Master the basics, then experiment.'],['Ignoring what customers actually say.','Talk to customers every week.'],['Doing everything alone for too long.','Get expert help where it saves time and money.'],['Counting likes instead of leads.','Track enquiries, calls and sales.'],['Waiting for perfect.','Launch at 80% and improve with real data.'],['Buying tools before fixing the process.','Fix the process, then pick the tool.']],
+steps:t=>[`Get clear: write the one result you want from ${t}.`,`Audit: list what you do now and what isn't working.`,`Cut: keep the 20% that drives most of the results.`,`Build: set up a simple system you can repeat.`,`Measure: check 1 or 2 numbers every week.`,`Improve: adjust once a month based on real data.`],
+myth:[['You need perfect tools to start.','You need a clear goal and steady practice.'],['Results come overnight.','Small daily progress compounds.'],['Only experts can do this.','Every expert started as a beginner.'],['More information means more progress.','Applying one idea beats reading ten.'],['It is too expensive for small businesses.','Most of the value comes from simple, cheap steps.']],
+ba:[['Random effort, no plan.','A clear weekly system.'],['Everything done by hand.','Repeated tasks automated.'],['Guessing what works.','Decisions based on data.'],['Results come and go.','Predictable progress.'],['Busy all day.','Focused on what grows the business.']],
+g:{brk:['Here’s the breakdown:','Here’s what works:','Quick version:','What I’d tell a friend:'],see:A=>[`I see this pattern with ${A} all the time.`,`I keep having the same conversation with ${A}.`,`This comes up in almost every call I have with ${A}.`],s1:['They work hard. They try new tools.\nBut the results stay flat.','Lots of effort. New tools every month.\nSame results.','They\'re not lazy. Far from it.\nThey\'re just pointed in the wrong direction.'],s3:['The problem usually isn’t effort.\nIt’s the approach.','More effort won’t fix a broken approach.'],works:['What actually works:','What changed things:','What I’d do instead:'],lesson:['The lesson:','Biggest takeaway:','If you remember one thing:'],c1:A=>[`The usual advice sounds good.\nIn practice, it keeps ${A} stuck.`,`Everyone repeats the same advice.\nAnd most ${A} stay stuck following it.`],less:['Less noise. More results.','Boring? Maybe. It works.','Simple beats clever here.'],sit:t=>[`The situation:\nA business puts real effort into ${t} but gets little back.`,`Picture this:\nA small team spends hours on ${t} every week. Nothing moves.`],would:['What I’d do:','The fix, step by step:'],out:['What to expect:\nA clearer process, less wasted time, and results you can actually measure.','The result:\nLess chaos, fewer wasted hours, and numbers you can actually track.'],bridge:['The bridge isn’t more hustle.\nIt’s a simple system you can repeat.','Getting from before to after isn’t magic.\nIt’s a few small habits, done every week.'],wins:['Here are 3 quick wins from it:','3 things from it you can use today:'],want:k=>[`Want the full list? Comment "${k}" and I’ll send it over.`,`Comment "${k}" and I’ll DM it to you.`],proc:['My process:','How I actually do it:'],tools:['Tools matter less than the process.','The tool is the easy part. The process is the edge.'],opts:[['A) Do it yourself and learn the hard way','B) Hire an expert and move faster','C) A mix of both'],['A) Start small and test','B) Go all in from day one']],vote:['Tell me in the comments: A, B or C?','Which one are you? Comment below.'],fact:'Fact',myth:'Myth',step:'Step',before:'Before',after:'After'},
+cta:{leads:(t,A,k,o)=>fresh([`${cap(A)}: if ${t} is on your list this quarter, I can help.\n\nDM me "${k}"${o?` for ${o}.`:` and I’ll share honest, practical advice for your case.`}`,`If you're one of the ${A} working on ${t} right now, my DMs are open.\n\nSend me "${k}"${o?` and I'll set you up with ${o}.`:` and tell me where you're stuck.`}`],'cl'),reach:t=>fresh(TXT.en.c(t),'v3c')+'\n\n♻️ Repost if this could help someone in your network.',authority:(t,n,nm)=>`What has your experience with ${t} been? I read every comment.\n\nFollow ${nm} for practical posts on ${n}.`},
+ps:s=>`P.S. ${cap(s)} is what I do every day. Happy to chat.`,fc:tp=>`Bonus tip: ${tp}\n\nWhat would you add?`},
+ru:{h:{story:t=>[`Main ne ${t} ko kaafi arsay tak ghalat samjha.`,`Jis din ${t} sahi samajh aaya, sab badal gaya.`,`${t} ka ye pehlu koi nahi batata.`],
+contrarian:t=>[`Unpopular opinion: ${t} par zyada tar advice ulti hai.`,`Masla ${t} nahi, approach hai.`,`${t} ko "normal" tareeqe se karna band karein.`],
+listicle:(t,n)=>[`${t} ke ${n} sabaq jo kaash pehle pata hote:`,`Save kar lein: ${t} ki ${n} kaam ki tips.`,`Agar ${t} dobara shuru karna ho, to ye ${n} kaam karun.`],
+howto:(t,n)=>[`${t} ko ${n} aasaan steps mein sahi karein:`,`${t} ka simple process (copy kar lein):`],
+mistakes:(t,n,A)=>[`${t} ki ${n} ghaltiyan jo ${A} ka paisa zaya karti hain.`,`${t} mein masla hai? Pehle ye ${n} ghaltiyan check karein.`],
+case:t=>[`${t} ka masla practically kaise hal hota hai:`,`${t} ka ek aam masla, aur us ka hal.`],
+myth:(t,n)=>[`${t} ke ${n} myths jo ab khatam hone chahiye.`,`Myth vs Fact: ${t}.`],
+beforeafter:t=>[`${t} sahi karne se pehle vs baad:`,`${t}: log kahan hain vs kahan ho sakte hain.`],
+magnet:t=>[`Maine apni behtareen ${t} advice ek checklist mein daal di.`,`${t} checklist chahiye? Pehle ye parhein.`],
+bts:t=>[`Mera ${t} ka asal process:`,`Behind the scenes: ${t} kaise hota hai.`],
+opinion:t=>[`${t} par ek sawal:`,`${t}: aap kis side par hain?`]},
+tips:(t,A)=>[`${t} ke liye pehle ek saaf goal tay karein.`,`Kuch banane se pehle 3 asal ${A} se baat karein.`,`Pehle simple version launch karein, phir feedback se behtar.`,`Wo napein jo revenue par asar kare, likes nahi.`,`Baar baar hone wale kaam automate karein.`,`Jo kaam kare use checklist bana lein.`,`Har 30 din baad ek bekaar cheez band karein.`,`Simple rakhein. Complexity momentum khatam karti hai.`,`Rozana 45 minute isi ko dein, aik hi waqt par.`,`Apne pichle 3 customers se poochein unhon ne "haan" kyun kaha.`],
+mist:[['Bina goal ke shuru karna.','Pehle ek measurable result tay karein.'],['Bade brands ko bina budget ke copy karna.','Apne stage ke mutabiq kaam karein.'],['Har naye trend ke peeche bhagna.','Pehle basics mazboot karein.'],['Customers ki baat na sunna.','Har hafte customers se baat karein.'],['Sab kuch akele karna.','Jahan time aur paisa bache wahan expert help lein.'],['Leads ki jagah likes ginna.','Enquiries aur sales track karein.']],
+steps:t=>[`Clarity: ${t} se ek result kya chahiye, likh lein.`,`Audit: abhi kya ho raha hai aur kya kaam nahi kar raha.`,`Cut: wo 20% rakhein jo zyada result deta hai.`,`Build: simple system banayein jo dohraya ja sake.`,`Measure: har hafte 1-2 numbers dekhein.`,`Improve: har mahine data dekh kar behtar karein.`],
+myth:[['Shuru karne ke liye perfect tools chahiye.','Saaf goal aur mustaqil practice chahiye.'],['Result raaton raat aata hai.','Chhoti rozana progress jud kar bara result banti hai.'],['Ye sirf experts kar sakte hain.','Har expert kabhi beginner tha.'],['Zyada information = zyada progress.','Ek idea par amal 10 parhne se behtar hai.']],
+ba:[['Random koshish, koi plan nahi.','Saaf weekly system.'],['Sab kuch haath se.','Repetitive kaam automated.'],['Andazon par faisle.','Data par faisle.'],['Kabhi result, kabhi nahi.','Predictable progress.']],
+g:{brk:['Mukhtasar khulasa:','Jo asal mein kaam karta hai:','Seedhi baat:'],see:A=>[`${A} ke saath ye pattern baar baar dekha hai.`,`${A} se aksar yahi baat hoti hai.`],s1:['Mehnat poori, naye tools bhi.\nLekin result wahi.','Koshish ki kami nahi.\nBas direction ghalat hai.'],s3:['Masla mehnat ka nahi.\nApproach ka hai.'],works:['Jo kaam karta hai:','Jis cheez ne farq dala:'],lesson:['Sabaq:','Aik baat yaad rakhein:'],c1:A=>[`Aam advice achi lagti hai.\nLekin amal mein ${A} wahin ruke rehte hain.`],less:['Kam shor. Zyada result.','Boring lagta hai, lekin kaam karta hai.'],sit:t=>[`Situation:\nEk business ${t} par mehnat karta hai, lekin result kam milta hai.`],would:['Main kya karta:','Hal, step by step:'],out:['Natija:\nSaaf process, kam waqt zaya, aur result jo nape ja sakein.'],bridge:['Pehle se baad tak ka raasta zyada hustle nahi.\nEk simple system hai jo har hafte dohraya jaye.'],wins:['Is ki 3 quick wins:'],want:k=>[`Poori list chahiye? Comment mein "${k}" likhein, DM kar di jayegi.`],proc:['Process:'],tools:['Tools se zyada process ahem hai.'],opts:[['A) Khud seekh kar karein','B) Expert hire karke tez chalein','C) Dono ka mix']],vote:['Comments mein batayein: A, B ya C?'],fact:'Fact',myth:'Myth',step:'Step',before:'Pehle',after:'Baad'},
+cta:{leads:(t,A,k,o)=>`${A}: agar ${t} is quarter aap ki list par hai, to baat karte hain.\n\nMujhe "${k}" DM karein${o?`, ${o} ke liye.`:`, aap ke case ke liye seedha aur kaam ka mashwara milega.`}`,reach:t=>fresh(TXT.ru.c(t),'v3cr')+'\n\n♻️ Repost karein taake aur log faida uthayein.',authority:(t,n,nm)=>`${t} ke saath aap ka tajurba kaisa raha? Har comment parhta/parhti hoon.\n\nMazeed ke liye ${nm} ko follow karein.`},
+ps:s=>`P.S. ${s} mera rozana ka kaam hai. Baat karne mein khushi hogi.`,fc:tp=>`Bonus tip: ${tp}\n\nAap kya add karenge?`}};
+function local3(msg,f){if(lang==='ur'){const r=local(msg);const tg=(r.tags||[]).slice(0,5);r.text=r.text.replace(/\n\n#[^\n]*$/,'')+'\n\n'+tg.join(' ');r.tags=tg;r.hooks=[];r.fc='';return r}
+const X=LX[lang],g=X.g,P=a=>fresh(a,'g'+lang+String(a[0]).slice(0,12)),t0=topicOf(msg),Q=isQ(t0);
+const t=((Q?t0.replace(/^(what|why|how|when|who|which|kya|kaise|kyun|kyon|kia)\s+(is|are|does|do|to|can|should|hai|hain)?\s*/i,''):t0).replace(/[?؟.]+$/,'').trim())||t0;
+const A=BR.audience||'business owners',kw=(BR.kw||'HELP').toUpperCase(),n=f==='myth'?4:f==='mistakes'?5:f==='howto'||f==='bts'?5:6;
+const hooks=pickN((X.h[f]||X.h.listicle)(t,n,A),'v3h'+f+lang,3),hook=Q?cap(t0).replace(/[?؟]*$/,'?'):hooks[0];
+const tips=pickN(X.tips(t,A),'v3t'+lang,6),mist=pickN(X.mist,'v3m'+lang,5),steps=X.steps(t).slice(0,n),myth=pickN(X.myth,'v3y'+lang,4),ba=pickN(X.ba,'v3b'+lang,4),kt=fresh(TXT[lang].k,lang+'k');
+const mark=fresh(['num','arrow','dot','check'],'mark'),M=(i)=>mark==='num'?(i+1)+'.':mark==='arrow'?'→':mark==='dot'?'•':'✅',L=(a,fm)=>a.map((x,i)=>fm?fm(x,i):`${M(i)} ${x}`).join(fresh(['\n\n','\n'],'sp'));
+let b;switch(f){
+case'story':b=[P(g.see(A)),P(g.s1),P(g.s3),P(g.works),L(tips.slice(0,3)),P(g.lesson)+'\n'+kt];break;
+case'contrarian':b=[P(g.c1(A)),P(g.works),L(tips.slice(0,4)),P(g.less)];break;
+case'listicle':b=[P(g.brk),L(tips.slice(0,6))];break;
+case'howto':b=[P(g.brk),L(steps,(x,i)=>`${g.step} ${i+1}: ${x}`),kt];break;
+case'mistakes':b=[P(g.brk),L(mist,x=>`❌ ${x[0]}\n✅ ${x[1]}`)];break;
+case'case':b=[P(g.sit(t)),P(g.would),L(steps.slice(0,3)),P(g.out),P(g.lesson)+'\n'+kt];break;
+case'myth':b=[L(myth,x=>`${g.myth}: ${x[0]}\n${g.fact}: ${x[1]}`)];break;
+case'beforeafter':b=[L(ba,x=>`${g.before}: ${x[0]}\n${g.after}: ${x[1]}`),P(g.bridge)];break;
+case'magnet':b=[P(g.wins),L(tips.slice(0,3)),P(g.want(kw))];break;
+case'bts':b=[P(g.proc),L(steps,(x,i)=>`${i+1}. ${x}`),P(g.tools)];break;
+case'opinion':b=[P(g.opts).join('\n'),P(g.vote)];break;
+default:b=[P(g.brk),L(tips)]}
+const cta=f==='opinion'?'':BR.goal==='reach'?X.cta.reach(t):BR.goal==='authority'?X.cta.authority(t,BR.niche||t,cfg.name):X.cta.leads(t,A,kw,BR.offer);
+const ps=BR.goal==='leads'&&f!=='opinion'&&seg(BR.services)[0]?X.ps(seg(BR.services)[0]):'';
+const nt=String(BR.niche||'').split(/,|&|\band\b|\n/i).map(x=>x.trim()).filter(Boolean).slice(0,1).map(x=>'#'+x.replace(/[^\p{L}\p{N}]/gu,'')).filter(x=>x.length>2&&x.length<30),wd=new Set(t.toLowerCase().split(/\s+/)),cm='#'+t.replace(/[^\p{L}\p{N} ]/gu,'').split(/\s+/).filter(Boolean).map(cap).join(''),tags=[...new Set([...(cm.length>3&&cm.length<=26?[cm]:[]),...nt,...hashtags(t).filter(x=>!wd.has(x.slice(1).toLowerCase()))])].slice(0,5);
+const sub=Q?fresh(TXT[lang].hq(t),lang+'q'):null,text=[hook,sub,...b,cta,ps,tags.join(' ')].filter(Boolean).join('\n\n');
+const points=f==='mistakes'?mist.map(x=>x[1]):f==='myth'?myth.map(x=>x[1]):f==='beforeafter'?ba.map(x=>x[1]):f==='howto'||f==='bts'||f==='case'?steps:tips;
+return{text,tags,hooks:hooks.filter(x=>x!==hook).slice(0,3),fc:X.fc(tips[5]||kt),d:{headline:hook.replace(/[:]+$/,''),points:points.slice(0,6),bl:kt,myth:myth.map(x=>[g.myth+': '+x[0],g.fact+': '+x[1]])}}}
+
+/* ---------- Viral score ---------- */
+function scorePost(t){const L=t.split('\n'),first=(L.find(x=>x.trim())||'').trim(),len=t.length,tags=(t.match(/#[\p{L}\p{N}_]+/gu)||[]).length,ln=L.filter(x=>x.trim()),avg=ln.reduce((a,x)=>a+x.length,0)/Math.max(1,ln.length),q=/[?؟]/.test(t.slice(-500)),link=/https?:\/\//i.test(t),cta=/\b(dm|comment|message|inbox|follow|save|repost|share|call|chat)\b|کمنٹ|فالو/i.test(t),you=(t.match(/\b(you|your|aap|ap)\b|آپ/gi)||[]).length,em=(t.match(/\p{Extended_Pictographic}/gu)||[]).length,ai=(t.match(/\b(game-?changer|delve|unlock|leverage|elevate|seamless|robust|harness|landscape|fast-paced)\b|—/gi)||[]).length;
+let s=0;const tips=[],ck=(ok,p,tip)=>{if(ok)s+=p;else tips.push(tip)};
+ck(first.length>0&&first.length<=75,18,'Hook (pehli line) 75 characters se chhoti karein.');
+ck(len>=700&&len<=2300,14,'Post 700–2300 characters ke darmiyan best chalti hai (abhi '+len+').');
+ck(avg<=95,10,'Lines chhoti karein: har line mein ek idea.');
+ck(q,12,'Aakhir mein ek aasaan, specific sawal poochein taake comments aayein.');
+ck(cta,14,'Clear CTA dalein (DM / comment keyword / follow).');
+ck(tags>=3&&tags<=5,8,'3–5 hashtags best hain (abhi '+tags+').');
+ck(!link,8,'Link post mein na dalein, first comment mein dalein (warna reach girti hai).');
+ck(you>=2,6,'Reader se baat karein: "you / aap" zyada use karein.');
+ck(em<=6,5,'Emojis kam karein (6 se kam), warna post AI jaisi lagti hai.');
+ck(ai===0,5,'AI jaise lafz hatayein (game-changer, unlock, leverage, em-dash —).');
+return{s,tips}}
+function scoreEl(t){const{s,tips}=scorePost(t),col=s>=80?'#16a34a':s>=60?'#d97706':'#dc2626';return mk('div',{className:'sec',style:'margin:6px 0'},mk('div',{style:'display:flex;align-items:center;gap:10px;flex-wrap:wrap'},mk('span',{className:'sc',style:`background:${col};color:#fff`},'Viral score '+s+'/100'),mk('span',{className:'mut'},s>=80?'Zabardast, post karne ke liye tayyar.':s>=60?'Acha hai, tips se aur behtar karein.':'Behtar karne ki zaroorat hai.')),tips.length?mk('div',{style:'margin-top:6px'},...tips.slice(0,4).map(x=>mk('div',{className:'tip'},'• '+x))):null)}
+
+/* ---------- LinkedIn posting ---------- */
+async function postRaw(text,cv,alt){const res=await fetch(cfg.wurl+'/post',{method:'POST',headers:{'Content-Type':'application/json','X-App-Key':cfg.wkey},body:JSON.stringify({text,image:cv.toDataURL('image/png').split(',')[1],alt:alt||''})});const j=await res.json().catch(()=>({}));if(!res.ok)throw new Error(j.error||('HTTP '+res.status));return j}
+function openComposer(text,cv){window.open('https://www.linkedin.com/feed/?shareActive=true&text='+encodeURIComponent(text),'_blank','noopener');copy(text);if(cv)saveImg(cv);add('b','LinkedIn composer khul gaya. Text bhara hua hai (clipboard mein bhi copy hai, agar khali dikhe to Ctrl+V karein). Image download ho gayi: composer mein 🖼 icon se attach karke Post dabayein.')}
+function noWorker(){return mk('div',null,'Direct auto-post ke liye LinkedIn Worker chahiye (Settings → Worker URL + App Key → Connect LinkedIn). Us ke bagair bhi "Open in LinkedIn" button 1 click mein composer khol deta hai.',mk('div',{className:'row'},mk('button',{on:{click:openSt}},'Worker settings')))}
+async function postLI3(b,r){if(!cfg.wurl||!cfg.wkey){add('b',noWorker());return}if(b.disabled)return;b.disabled=true;const o=b.textContent;b.textContent='Posting…';
+try{const j=await postRaw(r.text,exportSmall(r.d),r.d.headline);b.textContent='Posted ✅';const m=mk('div',null,'LinkedIn par post ho gayi ✅ '+(j.url||''));if(r.fc){const c=mk('button',{className:'p'},'Copy first comment');c.onclick=async()=>{await copy(r.fc);c.textContent='Copied ✓'};m.append(mk('div',{className:'tip',style:'margin-top:6px'},'Ab foran ye first comment apni post par karein. Pehle 60 minute ka engagement reach decide karta hai:'),mk('div',{style:'white-space:pre-wrap;margin:6px 0'},r.fc),c)}add('b',m)}
+catch(e){b.disabled=false;b.textContent=o;add('b','Post nahi hui: '+e.message+'. "Open in LinkedIn" button se bhi post kar sakte hain.')}}
+
+/* ---------- Scheduler ---------- */
+const saveQ=()=>LS.set('vs_queue',QU);
+function nextSlot(){const d=new Date();for(let i=0;i<9;i++){const x=new Date(d);x.setDate(d.getDate()+i);x.setHours(9,0,0,0);if([2,3,4].includes(x.getDay())&&x>d)return x}const x=new Date(d.getTime()+864e5);x.setHours(9,0,0,0);return x}
+const dtl=x=>{const p=n=>String(n).padStart(2,'0');return `${x.getFullYear()}-${p(x.getMonth()+1)}-${p(x.getDate())}T${p(x.getHours())}:${p(x.getMinutes())}`};
+function qAdd(r,when){const d=Object.assign({},r.d);delete d.bgImg;QU=LS.get('vs_queue')||[];QU.push({id:Date.now()+''+Math.floor(Math.random()*999),text:r.text,d,when,st:'wait',fc:r.fc||''});saveQ()}
+function qOpen(q){openComposer(q.text,exportSmall(q.d))}
+async function qPostNow(id){QU=LS.get('vs_queue')||[];const q=QU.find(x=>x.id===id);if(!q)return;if(!cfg.wurl||!cfg.wkey){qOpen(q);q.st='done';saveQ();return}try{await postRaw(q.text,exportSmall(q.d),q.d.headline);q.st='done';add('b','✅ Scheduled post LinkedIn par chali gayi.'+(q.fc?'\n\nFirst comment:\n'+q.fc:''))}catch(e){q.st='fail';add('b','⚠️ Post fail: '+e.message)}saveQ()}
+async function qTick(){QU=LS.get('vs_queue')||[];const now=Date.now();let ch=false;for(const q of QU){if(q.st!=='wait'||q.when>now)continue;ch=true;
+if(BR.auto&&cfg.wurl&&cfg.wkey){try{await postRaw(q.text,exportSmall(q.d),q.d.headline);q.st='done';add('b','⏰ Scheduled post khud LinkedIn par post ho gayi ✅'+(q.fc?'\n\nAb ye first comment karein:\n'+q.fc:''))}catch(e){q.st='fail';add('b','⏰ Scheduled post fail: '+e.message)}}
+else{q.st='due';add('b',mk('div',null,'⏰ Post ka waqt ho gaya: "'+q.text.split('\n')[0]+'"',mk('div',{className:'row'},mk('button',{className:'p',on:{click:()=>qPostNow(q.id)}},'Post now'),mk('button',{on:{click:()=>qOpen(q)}},'Open in LinkedIn'))));try{document.title='🔔 Post time! · LinkedIn Viral Studio'}catch(e){}}}if(ch)saveQ()}
+setInterval(qTick,30000);setTimeout(qTick,4000);
+
+/* ---------- Ideas / topics ---------- */
+const IDT={en:[[(p,A)=>`3 mistakes ${A} make with ${p}`,'mistakes'],[p=>`How I'd approach ${p} from scratch today`,'howto'],[p=>`${p}: myth vs reality`,'myth'],[p=>`An unpopular opinion about ${p}`,'contrarian'],[p=>`Before vs after: ${p} done right`,'beforeafter'],[p=>`My exact process for ${p}`,'bts'],[(p,A)=>`A free ${p} checklist for ${A}`,'magnet'],[p=>`The ${p} lesson that changed how I work`,'story'],[p=>`7 quick ${p} tips you can use today`,'listicle'],[p=>`${p}: DIY or hire an expert?`,'opinion'],[p=>`A typical ${p} problem and how to fix it`,'case']],
+ru:[[(p,A)=>`${A} ${p} mein ye 3 ghaltiyan karte hain`,'mistakes'],[p=>`Aaj zero se ${p} kaise shuru karein`,'howto'],[p=>`${p}: myth vs haqeeqat`,'myth'],[p=>`${p} par ek unpopular opinion`,'contrarian'],[p=>`${p} sahi karne se pehle vs baad`,'beforeafter'],[p=>`${p} ka asal process`,'bts'],[(p,A)=>`${A} ke liye free ${p} checklist`,'magnet'],[p=>`${p} ka wo sabaq jis ne kaam badal diya`,'story'],[p=>`${p} ki 7 quick tips`,'listicle'],[p=>`${p}: khud karein ya expert hire karein?`,'opinion'],[p=>`${p} ka ek aam masla aur us ka hal`,'case']]};
+function localIdeas(n){const P=pil();if(!P.length)P.push(BR.niche||'personal growth');const A=BR.audience||'business owners',T=lang==='en'?IDT.en:IDT.ru,k=Math.floor(Math.random()*T.length),o=[];for(let i=0;i<n;i++){const p=P[i%P.length],tp=T[(k+i*5)%T.length];o.push({title:tp[0](p,A),f:tp[1],topic:p})}return o}
+async function aiIdeas(){const pr=`You are a LinkedIn content strategist for ${cfg.name} (${cfg.role||''}). Niche: ${BR.niche}. Services: ${BR.services}. Ideal clients: ${BR.audience}. Goal: ${GDESC[BR.goal]}. Content pillars: ${pil().join('; ')||BR.niche}.
+Create a 30-day LinkedIn plan: 30 post ideas that attract the ideal clients and grow reach. Each idea must be specific (not generic), tied to a real problem or desire of the ideal clients, rotate through the pillars and mix formats. Titles in ${LNm()}.
+Allowed formats: story, contrarian, listicle, howto, mistakes, case, myth, beforeafter, magnet, bts, opinion.
+Return ONLY JSON: {"ideas":[{"title":"specific post idea, max 14 words","topic":"short topic, 2-6 words","formula":"one allowed format"}]}`;
+const o=await llmJSON(pr),a=((o&&o.ideas)||[]).filter(x=>x&&x.title).map(x=>({title:String(x.title).slice(0,120),topic:String(x.topic||x.title).slice(0,70),f:FDESC[x.formula]?x.formula:'listicle'}));if(a.length<5)throw new Error('kam ideas aaye');return a.slice(0,30)}
+function runIdea(it){ONE_F=it.f;ANGLE=it.title;add('u','💡 '+it.title);setTimeout(()=>reply(it.topic),200)}
+function autoTopic(){const s=LS.get('vs_ideas'),pool=s&&s.length?s:localIdeas(30);runIdea(R(pool))}
+
+/* ---------- Comments / DMs ---------- */
+function kws(t){const st=/^(about|their|there|which|would|could|should|these|those|because|people|really|thing|things|being|where|while|after|before|other|every|always|never|actually|today|something|without|through|everyone|looking|anyone|recommendations|flexible|budget|right|person|great|thanks|sharing)$/i,f={};(String(t).toLowerCase().match(/[\p{L}]{5,}/gu)||[]).forEach(w=>{if(!st.test(w))f[w]=(f[w]||0)+1});return Object.entries(f).sort((a,b)=>b[1]-a[1]).map(x=>x[0])}
+async function aiComments(t,mode){const who=`You are ${cfg.name}, ${cfg.role||''}. Niche: ${BR.niche}. Services: ${BR.services}. You want your ideal clients (${BR.audience}) to notice your expertise. You write like a real human: contractions, no em dashes, no AI buzzwords, no generic praise.`;
+const pr=mode==='reply'?`${who}
+Someone commented on YOUR LinkedIn post. Write 3 different warm, specific replies (1-3 sentences, under 400 characters each). Thank them naturally (not generically), add one useful detail, end with a question that keeps the conversation going. If the comment shows they need help with your services, the third reply can gently invite them to DM. No hashtags, no links. Reply in the same language as the comment.
+Return ONLY JSON: {"comments":[{"style":"short label","text":"reply"}],"dm":""}
+COMMENT:
+"""${t.slice(0,3000)}"""`:`${who}
+Write 3 distinct LinkedIn comments on the post below. Purpose: add genuine value so the author and readers notice you and visit your profile. Rules: reference one specific detail from the post; share one concrete insight, tip or short experience; 2-4 sentences, under 600 characters; never pitch your services; no links, no hashtags, max 1 emoji; never start with "Great post", "Thanks for sharing" or "Love this". Write in the same language as the post.
+Styles: 1) "Value add", 2) "Experience + question", 3) "Respectful nuance".
+If the post shows the author or someone NEEDS help with ${BR.services} (hiring, looking for, asking for recommendations), also write a short friendly DM to them (under 500 characters, helpful, no hard sell). Otherwise "dm" must be "".
+Return ONLY JSON: {"comments":[{"style":"Value add","text":""},{"style":"Experience + question","text":""},{"style":"Respectful nuance","text":""}],"dm":""}
+POST:
+"""${t.slice(0,4000)}"""`;
+const o=await llmJSON(pr),c=((o&&o.comments)||[]).filter(x=>x&&x.text).map(x=>({style:String(x.style||'Comment'),text:String(x.text).replace(/\s*—\s*/g,', ')}));if(!c.length)throw new Error('khali jawab');return{comments:c.slice(0,3),dm:o.dm?String(o.dm):''}}
+function localComments(t,mode){const k=kws(t),k1=k[0]||'this',k2=k[1]||'consistency',A=BR.audience||'business owners',tip=fresh(LX.en.tips(k1,A),'lc');
+if(mode==='reply')return{comments:[{style:'Warm + question',text:`Appreciate you adding this. The point about ${k1} is so true. How are you handling it on your side right now?`},{style:'Add value',text:`Exactly. One thing that helps with ${k1}: ${tip} Have you tried that yet?`},{style:'Invite to DM',text:`Really like this angle. If you're working on ${k1} right now, feel free to DM me. Happy to share a few practical ideas.`}],dm:''};
+return{comments:[{style:'Value add',text:`The part about ${k1} stands out. One thing that makes a big difference in practice: ${tip} That's usually where results start to compound.`},{style:'Experience + question',text:`This matches what I see with ${A}. The ones who keep ${k1} simple and consistent win. How do you approach ${k2} when time is tight?`},{style:'Respectful nuance',text:`Agree with most of this. One nuance on ${k1}: context matters. What works for a big team often needs a lighter version for smaller businesses.`}],dm:''}}
+async function aiDM(info){const pr=`You are ${cfg.name}, ${cfg.role||''}. Niche: ${BR.niche}. Services: ${BR.services}. Offer: ${BR.offer||'none'}. Proof: ${BR.proof||'none, do not claim results'}.
+Write LinkedIn outreach for the prospect below. Human, specific to them, value-first, never spammy, no fake familiarity, no invented facts, no em dashes, no AI buzzwords.
+"note": connection request, under 280 characters, mention something specific about them, no pitch.
+"dm1": first message after they accept: thank them, one specific observation or helpful idea for their business related to your services, end with a low-pressure question. Under 600 characters.
+"dm2": follow-up 4-5 days later if no reply: short, one more useful tip, soft invite to a quick chat. Under 400 characters.
+Language: ${LNm()} (if the prospect info is clearly in another language, match it).
+Return ONLY JSON: {"note":"","dm1":"","dm2":""}
+PROSPECT:
+"""${info.slice(0,3000)}"""`;const o=await llmJSON(pr);if(!o||!o.note)throw new Error('khali jawab');return o}
+function localDM(info){const k=kws(info),k1=k[0]||'your work',k2=k[1]||'growth',A=BR.audience||'business owners',S=seg(BR.services)[0]||BR.niche||'my work',tip=fresh(LX.en.tips(k1,A),'ld');
+return{note:`Hi! Came across your profile and your focus on ${k1} caught my eye. I work with ${A} on ${S}. Would be great to connect.`,dm1:`Thanks for connecting! I noticed your focus on ${k1}. One quick idea that often helps: ${tip} Is ${k2} something you're working on this quarter?`,dm2:`Quick follow-up. If ${k1} is a priority, happy to share a few practical ideas on a 15-minute call. No pressure at all, great to be connected either way.`}}
+function cmCard(l,t,u){const a=tax(t,'',Math.min(8,Math.max(3,Math.ceil(t.length/70)))),b1=mk('button',{className:'p'},'Copy');b1.onclick=async()=>{await copy(a.value);b1.textContent='Copied ✓';setTimeout(()=>b1.textContent='Copy',1500)};const row=mk('div',{className:'row'},b1);
+if(u&&/^https:\/\/([\w-]+\.)?linkedin\.com\//i.test(u))row.appendChild(mk('button',{on:{click:()=>{window.open(u,'_blank','noopener');copy(a.value)}}},'Copy + post kholein'));return mk('div',{className:'sec'},mk('h4',null,l),a,row)}
+const openSearch=p=>window.open('https://www.linkedin.com/search/results/content/?keywords='+encodeURIComponent('"'+p+'"')+'&sortBy='+encodeURIComponent('"date_posted"'),'_blank','noopener');
+
+/* ---------- Growth Hub panel ---------- */
+const closeGH=()=>$('#gp').classList.remove('on');
+function openGH(tab){if(tab)GT=tab;renderGH();$('#gp').classList.add('on')}
+function renderGH(){$('#gtabs').replaceChildren(...[['profile','👤 Profile'],['ideas','💡 Content Plan'],['comments','💬 Comments'],['clients','🎯 Client Hunter'],['queue','⏰ Schedule']].map(([k,l])=>mk('span',{className:'chip'+(GT===k?' on':''),on:{click:()=>{GT=k;renderGH()}}},l)));$('#gbody').replaceChildren(GHT[GT]())}
+const GHT={
+profile(){const f={niche:inpx(BR.niche,'Jaise: Web Development & AI Automation'),services:inpx(BR.services,'Comma se: website development, AI chatbots, Shopify stores'),audience:inpx(BR.audience,'Jaise: startup founders, restaurant owners, coaches'),offer:inpx(BR.offer,'Jaise: free 15-minute website audit (optional)'),proof:tax(BR.proof,'Sirf SACH results: jaise "40+ websites delivered". Khali chhor dein to AI koi result claim nahi karega.',2),tone:selx(BR.tone,[['friendly expert','Friendly expert'],['bold and direct','Bold & direct'],['storyteller','Storyteller'],['professional and polished','Professional'],['witty and casual','Witty & casual']]),goal:selx(BR.goal,GOALS),kw:inpx(BR.kw,'Jaise: AUDIT'),pillars:tax(BR.pillars,'Har line par ek topic',5)};
+const auto=mk('input',{type:'checkbox',checked:!!BR.auto}),ok=cfg.wurl&&cfg.wkey;
+return mk('div',null,mk('p',{className:'mut'},'Ye info har post, comment aur DM mein use hoti hai taake content aap ke ideal clients ke liye bane. Jitna sahi bharenge, utne behtar leads.'),
+fldx('Aap ka niche',f.niche),fldx('Services jo aap bechte hain',f.services),fldx('Ideal clients (kis ke liye likhna hai)',f.audience),fldx('Offer / CTA (optional)',f.offer),fldx('Real proof / results (optional, kabhi fake na likhein)',f.proof),fldx('Tone',f.tone),fldx('Main goal',f.goal),fldx('Comment keyword (lead magnet / DM CTA)',f.kw),fldx('Content pillars: aap ke 3–6 main topics',f.pillars),
+mk('div',{className:'sec'},mk('h4',null,'🔗 LinkedIn connection'),mk('div',{className:'mut'},ok?'✅ Worker connected hai. "Post to LinkedIn" seedha post karega.':'Worker set nahi. Phir bhi "Open in LinkedIn" se 1 click mein post ho jati hai (text khud bhar jata hai, image download ho jati hai).'),mk('div',{className:'row'},mk('button',{on:{click:()=>{closeGH();openSt()}}},'Worker / API settings'),mk('button',{on:{click:()=>window.open('https://www.linkedin.com/feed/','_blank','noopener')}},'LinkedIn kholein')),mk('div',{className:'ck'},auto,mk('span',null,'Scheduled posts waqt par khud post hon (Worker zaroori, ye page khula ho)'))),
+mk('div',{className:'row',style:'margin-top:14px'},mk('button',{className:'p',on:{click:()=>{for(const k in f)BR[k]=f[k].value.trim();BR.auto=auto.checked;LS.set('vs_brand',BR);bar();closeGH();add('b','✅ Growth profile save ho gaya. Ab har post aap ke ideal clients ('+(BR.audience||'-')+') ke liye banegi.')}}},'Save profile')))},
+ideas(){const list=mk('div'),msg=mk('div',{className:'mut',style:'margin:6px 0'});const show=a=>list.replaceChildren(...a.map((it,i)=>mk('div',{className:'idea'},mk('span',{className:'tag'},'Day '+(i+1)),mk('div',{style:'flex:1;min-width:160px'},mk('div',{style:'font-weight:600'},it.title),mk('div',{className:'mut'},FN(it.f)+' · '+it.topic)),mk('button',{className:'p',on:{click:()=>{closeGH();runIdea(it)}}},'Banayein'))));
+const s=LS.get('vs_ideas');if(s&&s.length)show(s);
+const gen=async ai=>{let a=null;msg.textContent=ai?'AI 30 ideas bana raha hai…':'';if(ai){try{a=await aiIdeas();msg.textContent=''}catch(e){msg.textContent='AI se nahi bana ('+(e.message||e)+'). Offline plan dikha raha hoon.'}}if(!a)a=localIdeas(30);LS.set('vs_ideas',a);show(a)};
+return mk('div',null,mk('p',{className:'mut'},'Aap ke pillars aur ideal clients ke hisaab se 30 din ka plan. Best time: Tue–Thu subah 8–10 baje. Hafte mein 3–5 posts kaafi hain.'),mk('div',{className:'row'},mk('button',{className:'p',on:{click:()=>gen(true)}},'✨ AI se 30-din plan'),mk('button',{on:{click:()=>gen(false)}},'⚡ Quick plan (offline)'),mk('button',{on:{click:()=>{closeGH();autoTopic()}}},'🎲 Aaj ki post bana do')),msg,list)},
+comments(){let mode='other';const post=tax('','Doosre shakhs ki LinkedIn post ka text yahan paste karein…',7),url=inpx('','https://www.linkedin.com/posts/… (optional)'),out=mk('div'),msg=mk('div',{className:'mut',style:'margin:6px 0'}),modes=mk('div',{className:'row'});
+const rm=()=>modes.replaceChildren(...[['other','Doosron ki post par comment'],['reply','Apni post ke comment ka reply']].map(([k,l])=>mk('span',{className:'chip'+(mode===k?' on':''),on:{click:()=>{mode=k;post.placeholder=k==='reply'?'Jo comment aap ki post par aaya, yahan paste karein…':'Doosre shakhs ki LinkedIn post ka text yahan paste karein…';rm()}}},l)));rm();
+const go=mk('button',{className:'p'},'Comments banayein');go.onclick=async()=>{const t=post.value.trim();if(t.length<20){msg.textContent='Pehle post ka text paste karein (kam az kam 1–2 lines).';return}go.disabled=true;msg.textContent='Ban rahe hain…';let res=null;try{res=await aiComments(t,mode);msg.textContent=''}catch(e){msg.textContent='AI nahi chala ('+(e.message||e)+'). Offline suggestions:'}if(!res)res=localComments(t,mode);go.disabled=false;out.replaceChildren(...res.comments.map(c=>cmCard(c.style,c.text,url.value.trim())),res.dm?cmCard('📩 DM (lagta hai inhein aap ki service chahiye)',res.dm,''):null)};
+return mk('div',null,mk('p',{className:'mut'},'Smart comments sab se tez free growth hain. Ideal clients aur bade creators ki posts par rozana 10–15 value-wale comments karein: log profile visit karte hain aur clients aate hain. LinkedIn auto-comment bots par account restrict karta hai, is liye yahan comment tayyar hota hai: Copy → post par paste.'),modes,fldx('Post / comment',post),fldx('Post URL (optional)',url),mk('div',{className:'row'},go),msg,out)},
+clients(){const sv=seg(BR.services).slice(0,3),PH=[];sv.forEach(s=>PH.push(`looking for ${s}`,`need help with ${s}`,`recommend ${s}`));PH.push('looking for a freelancer','looking for a developer','recommend an agency');
+const cs=inpx('','Apna phrase: jaise need a Shopify expert','flex:1;min-width:180px');
+const pi=tax('','Prospect ki headline / About / ya un ki recent post yahan paste karein…',5),out=mk('div'),msg=mk('div',{className:'mut',style:'margin:6px 0'}),go=mk('button',{className:'p'},'Messages banayein');
+go.onclick=async()=>{const t=pi.value.trim();if(t.length<15){msg.textContent='Pehle prospect ki info paste karein.';return}go.disabled=true;msg.textContent='Ban rahe hain…';let o=null;try{o=await aiDM(t);msg.textContent=''}catch(e){msg.textContent='AI nahi chala ('+(e.message||e)+'). Offline drafts:'}if(!o)o=localDM(t);go.disabled=false;out.replaceChildren(cmCard('🤝 Connection note (300 chars se kam)',String(o.note||''),''),cmCard('📩 DM 1 (connect hone ke baad)',String(o.dm1||''),''),cmCard('🔁 DM 2 (4–5 din baad follow-up)',String(o.dm2||''),''))};
+return mk('div',null,
+mk('div',{className:'sec'},mk('h4',null,'1) Buyer-intent posts dhoondein (sab se garam leads)'),mk('p',{className:'mut'},'Ye LinkedIn par latest posts kholta hai jahan log khud kisi ko dhoond rahe hain. Post copy karke 💬 Comments tab mein daalein: helpful comment + DM tayyar.'),mk('div',{className:'row'},...PH.slice(0,12).map(p=>mk('button',{on:{click:()=>openSearch(p)}},'🔎 '+p))),mk('div',{className:'row'},cs,mk('button',{className:'p',on:{click:()=>{if(cs.value.trim())openSearch(cs.value.trim())}}},'Search'))),
+mk('div',{className:'sec'},mk('h4',null,'2) Ideal clients ki profiles'),mk('div',{className:'row'},...seg(BR.audience).slice(0,4).map(a=>mk('button',{on:{click:()=>window.open('https://www.linkedin.com/search/results/people/?keywords='+encodeURIComponent(a),'_blank','noopener')}},'👥 '+a)))),
+mk('div',{className:'sec'},mk('h4',null,'3) Personal connection note + DMs'),pi,mk('div',{className:'row'},go),msg,out),
+mk('div',{className:'sec'},mk('h4',null,'📅 Rozana 30-minute client-hunting routine'),mk('div',{className:'tip',style:'white-space:pre-wrap'},'• 1 post (is app se), Tue–Thu subah 8–10 baje best\n• Post ke foran baad first comment, aur pehle 60 min har comment ka reply\n• 10–15 value comments ideal clients / bade creators ki posts par\n• 3 buyer-intent searches (upar), helpful comment + DM\n• 5–10 personal connection requests note ke saath\n• Bots / auto-DM tools kabhi nahi: LinkedIn account restrict kar deta hai')))},
+queue(){const box=mk('div');const dr=()=>{QU=LS.get('vs_queue')||[];if(!QU.length){box.replaceChildren(mk('p',{className:'mut'},'Abhi koi post schedule nahi. Kisi bhi post ke neeche "⏰ Schedule" dabayein.'));return}
+box.replaceChildren(...QU.slice().sort((a,b)=>a.when-b.when).map(q=>mk('div',{className:'idea'},mk('span',{className:'tag'},{wait:'⏳ waiting',due:'🔔 due',done:'✅ posted',fail:'⚠️ failed'}[q.st]||q.st),mk('div',{style:'flex:1;min-width:160px'},mk('div',{style:'font-weight:600'},new Date(q.when).toLocaleString()),mk('div',{className:'mut',style:'overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:360px'},q.text.split('\n')[0])),mk('button',{className:'p',on:{click:()=>qPostNow(q.id).then(dr)}},'Post now'),mk('button',{on:{click:()=>qOpen(q)}},'Open in LinkedIn'),mk('button',{title:'Delete',on:{click:()=>{QU=QU.filter(x=>x.id!==q.id);saveQ();dr()}}},'✕'))))};dr();
+return mk('div',null,mk('p',{className:'mut'},'Waqt aane par app aap ko yaad dilayega. Agar Profile mein "auto-post" on hai aur Worker connected hai to khud post karega (ye page khula hona chahiye).'),box)}};
+$('#gx').onclick=closeGH;
+
+/* ---------- Main reply (overrides v2) ---------- */
+async function reply(msg){const lw=/wide|landscape/i.test(msg)?'wide':/square/i.test(msg)?'square':size,L=TXT[lang],tp=topicOf(msg);let r=null,note='';const st=add('b','Soch raha hoon…'),S=t=>{st.textContent=t};
+const F=ONE_F||(FORMULA==='auto'?autoForm():FORMULA),ang=ANGLE;ONE_F=null;ANGLE='';
+const order=eng==='local'?[]:eng==='gemini'?['gemini']:eng==='ollama'?['ollama']:[cfg.key?'gemini':null,'ollama'].filter(Boolean);
+for(const e of order){try{S((e==='gemini'?'Gemini':'Ollama')+' se "'+FN(F)+'" post likh raha hoon…');r=await aiText3(msg,e,F,ang);r.src=e;break}catch(err){if(eng!=='auto'||e==='gemini')note+=(e==='gemini'?'Gemini':'Ollama')+' kaam nahi kiya ('+(err.message||err)+'). '}}
+if(!r){r=local3(msg,F);r.src='local';r.d.quote=r.d.bl}
+const hireF=dstyle==='hiring'||(dstyle==='auto'&&/\b(hir(e|ing)|vacanc\w*|recruit\w*)\b/i.test(msg));
+if(hireF){const hh=parseHire(msg);r.text=hireText(hh);r.tags=hireTags(hh);r.hooks=[];r.fc='';r.d=Object.assign({},r.d,{hire:hh,headline:'We Are Hiring',points:[hh.role]})}
+r.tags=r.tags||(r.text.match(/#[\p{L}\p{N}_]+/gu)||[]);
+const pts=(r.d.points||[]).slice();while(pts.length<6)pts.push(fresh(L.p,lang+'p'));
+const KK={en:['Quick read','Worth knowing','Save this','Pro tip','For founders','Real talk'],ru:['Mukhtasar parhein','Kaam ki baat','Aaj ka insight'],ur:['مختصر پڑھیں','جاننے کی بات','آج کی بات']}[lang],SL={en:'ideas worth keeping',ru:'kaam ki baatein',ur:'کام کی باتیں'}[lang];
+r.d=Object.assign({},r.d,{size:lw,lang,emoji:emojiOf(tp),points:pts,labels:r.d.labels||LAB[lang],lp:R(LP),cb:R(['#ffc400','#38bdf8','#a78bfa','#34d399']),cbi:Math.floor(Math.random()*4),kicker:fresh(KK,'kk'),quote:r.d.quote||r.d.bl||pts[0],stat:r.d.stat||{value:String(Math.min(6,pts.length)),label:SL}});r.d.bl=r.d.quote;
+r.d.style=hireF?'hiring':dstyle==='thumb'?'thumb':'studio';r.d.spec=mkSpec(r.art);
+const bi=XS().bi||'off';if(bi!=='off'&&r.d.style==='studio'){try{S('AI background image ban rahi hai…');r.d.bgImg=await makeBg(bi,r.imgp||tp,lw,r.d.spec.pal)}catch(err){note+='Background image nahi ban saki ('+(err.message||err)+'), generative design use hua. '}}
+st.remove();renderPost(r,msg,tp,note,F,ang)}
+function renderPost(r,msg,tp,note,F,ang){const w=mk('div'),SRC={gemini:'✨ Gemini AI',ollama:'🖥 Ollama AI',local:'⚡ Offline'}[r.src]||'';
+w.appendChild(mk('div',{className:'row',style:'margin:0 0 6px'},mk('span',{className:'tag'},FN(F)),mk('span',{className:'tag'},(GOALS.find(x=>x[0]===BR.goal)||GOALS[1])[1]),mk('span',{className:'tag'},SRC)));
+if(note)w.appendChild(mk('div',{className:'tip'},note));
+const pre=mk('div',{className:'pe',spellcheck:false,title:'Click karke edit karein',style:'margin:8px 0;padding:12px;border:1px dashed var(--bd);border-radius:10px;white-space:pre-wrap;line-height:1.55'});try{pre.contentEditable='plaintext-only'}catch(e){pre.contentEditable='true'}if(pre.contentEditable!=='plaintext-only')pre.contentEditable='true';pre.textContent=r.text;
+const sb=mk('div'),upd=()=>sb.replaceChildren(scoreEl(r.text));upd();pre.addEventListener('input',()=>{r.text=pre.innerText.replace(/\n{3,}/g,'\n\n');upd()});
+w.append(mk('div',{className:'tip'},'✏️ Post par click karke khud edit kar sakte hain. Score saath saath update hoga.'),pre,sb);
+const cv=document.createElement('canvas');cv.style.cssText='width:100%;height:auto;max-height:560px;object-fit:contain;border-radius:10px;display:block;margin:10px 0;background:#000';draw(cv,r.d);
+if(r.hooks&&r.hooks.length){const hb=mk('div',{className:'row'});r.hooks.forEach(hk=>{const b=mk('button',null,hk);b.onclick=()=>{const ls=r.text.split('\n'),i=ls.findIndex(x=>x.trim());if(i<0)return;const old=ls[i];ls[i]=b.textContent;r.text=ls.join('\n');pre.textContent=r.text;upd();r.d.headline=b.textContent.replace(/[:.]+$/,'').slice(0,90);draw(cv,r.d);b.textContent=old};hb.appendChild(b)});w.append(mk('div',{className:'sec',style:'margin:6px 0'},mk('h4',null,'🎣 Doosre hooks (click karein, pehli line badal jayegi)'),hb))}
+w.appendChild(cv);
+if(r.fc){const c=mk('button',null,'Copy');c.onclick=async()=>{await copy(r.fc);c.textContent='Copied ✓';setTimeout(()=>c.textContent='Copy',1500)};w.appendChild(mk('div',{className:'sec',style:'margin:6px 0'},mk('h4',null,'💬 First comment (post ke foran baad khud karein, reach barhti hai)'),mk('div',{style:'white-space:pre-wrap;font-size:14px'},r.fc),mk('div',{className:'row'},c)))}
+const row=mk('div',{className:'row'}),B=(l,f,p)=>{const b=mk('button',p?{className:'p'}:null,l);b.onclick=()=>f(b);row.appendChild(b);return b};
+B('Copy Post',async b=>{await copy(r.text);b.textContent='Copied ✓';setTimeout(()=>b.textContent='Copy Post',1500)},1);
+B('Post to LinkedIn',b=>postLI3(b,r),1);
+B('Open in LinkedIn',()=>openComposer(r.text,cv),1);
+const sch=mk('div',{className:'row',style:'display:none'}),dt=mk('input',{type:'datetime-local',value:dtl(nextSlot()),className:'dtl'});sch.append(dt,mk('button',{className:'p',on:{click:()=>{const tm=new Date(dt.value).getTime();if(!tm){return}qAdd(r,tm);sch.style.display='none';add('b','⏰ Post queue mein add ho gayi: '+new Date(tm).toLocaleString()+'. Growth Hub → Schedule mein dekh sakte hain.')}}},'Queue mein dalein'));
+B('⏰ Schedule',()=>{sch.style.display=sch.style.display==='none'?'flex':'none'});
+B('Copy Hashtags',async b=>{await copy((r.text.match(/#[\p{L}\p{N}_]+/gu)||[]).join(' '));b.textContent='Copied ✓';setTimeout(()=>b.textContent='Copy Hashtags',1500)});
+B('Slide Video',()=>openVideo(r,tp));B('Download HD PNG',()=>saveImg(cv));
+B('New design',()=>{if(r.d.style==='studio'){r.d.spec=mkSpec(r.art)}else{r.d.lp=R(LP);r.d.cbi=Math.floor(Math.random()*4)}draw(cv,r.d)});
+B('New version',()=>{ONE_F=F;ANGLE=ang;send(msg,true)});
+B('Different formula',()=>{ONE_F=fresh(FORMS.slice(1).map(x=>x[0]).filter(x=>x!==F),'df');ANGLE=ang;send(msg,true)});
+w.append(row,sch);
+w.appendChild(mk('div',{style:'font-size:12px;color:var(--mut);margin-top:8px'},r.src==='local'?'Offline mode: text built-in formulas se banta hai. Har post ko bilkul alag aur insaan jaisa banane ke liye Settings mein FREE Gemini key lagayein (aistudio.google.com).':'Content '+(r.src==='gemini'?'Gemini':'Ollama')+' se bana hai. Post karne se pehle facts aur apni awaaz khud check karein.'));
+add('b',w)}
+
+/* ---------- Bar + welcome ---------- */
+function bar(){const b=$('#bar');b.innerHTML='';const chip=(on,l,f)=>{const e=mk('span',{className:'chip'+(on?' on':'')},l);e.onclick=f;b.appendChild(e)},br=()=>b.appendChild(mk('div',{style:'flex-basis:100%;height:0'}));
+[['portrait','4:5'],['square','1:1'],['wide','Wide']].forEach(([k,l])=>chip(size===k,l,()=>{size=k;bar()}));
+[['en','English'],['ru','Roman Urdu'],['ur','اردو']].forEach(([k,l])=>chip(lang===k,l,()=>{lang=k;bar()}));br();
+GOALS.forEach(([k,l])=>chip(BR.goal===k,l,()=>{BR.goal=k;LS.set('vs_brand',BR);bar()}));
+const fs=selx(FORMULA,FORMS.map(([k,l])=>[k,(k==='auto'?'Formula: ':'')+l]));fs.title='Post formula';fs.onchange=()=>{FORMULA=fs.value;LS.set('vs_formula',FORMULA)};b.appendChild(fs);
+const ds=selx(dstyle,[['auto','Design: Auto'],['hero','Hero'],['center','Center'],['bento','Bento'],['stat','Big stat'],['quote','Quote'],['checklist','Checklist'],['split','Split'],['steps','Steps'],['diagonal','Diagonal'],['cover','Magazine'],['thumb','Thumbnail'],['hiring','Hiring']]);ds.title='Design';ds.onchange=()=>{dstyle=ds.value};b.appendChild(ds);
+chip(false,'🎲 Topic do',autoTopic)}
+$('#gh').onclick=()=>openGH();
+bar();$('#chat').replaceChildren();
+(function(){const sug=mk('div',{className:'sug',style:'margin-top:10px'},...pil().slice(0,3).map(p=>mk('button',{on:{click:()=>send(p)}},p)),mk('button',{className:'p',on:{click:()=>openGH('profile')}},'🚀 Growth Hub'));
+add('b',mk('div',null,mk('div',{style:'font-weight:700;font-size:15px'},'Assalam o Alaikum! 👋 LinkedIn Viral Studio v3: ab reach + client hunting ke saath.'),mk('div',{className:'tip',style:'margin-top:6px;white-space:pre-wrap;font-size:13px'},'1) 🚀 Growth Hub → Profile: apna niche, services aur ideal clients likhein (sirf ek dafa).\n2) Topic likhein ya 🎲 dabayein. Har dafa naya formula, nayi awaaz, naya design, aap ke clients ke liye.\n3) Har post ke saath Viral score, 3 hooks aur first comment milta hai.\n4) "Post to LinkedIn" (Worker) ya "Open in LinkedIn" (1 click) se post karein, ya ⏰ schedule karein.\n5) 💬 Comments tab se doosron ki posts par smart comments, 🎯 Client Hunter se leads aur DMs.'),cfg.key?null:mk('div',{className:'tip',style:'margin-top:6px'},'💡 Best (insaan jaisi, har baar alag) posts ke liye Settings mein FREE Gemini API key lagayein: aistudio.google.com/apikey'),sug))})();
+/*V3_END*/
 </script>
 </body>
 </html>
