@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>LinkedIn Viral Studio Pro v3</title>
+<title>LinkedIn Viral Studio Pro v4</title>
 <style>
 :root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#f6f7fb;--card:#fff;--tx:#0f172a;--mut:#64748b;--ac:#2563eb;--bd:#e2e8f0;--ub:#2563eb}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b1020;--card:#151b2e;--tx:#e8ecf5;--mut:#94a3b8;--bd:#263049;--ub:#3b6cf0}}
@@ -1106,6 +1106,154 @@ bar();$('#chat').replaceChildren();
 (function(){const sug=mk('div',{className:'sug',style:'margin-top:10px'},...pil().slice(0,3).map(p=>mk('button',{on:{click:()=>send(p)}},p)),mk('button',{className:'p',on:{click:()=>openGH('profile')}},'🚀 Growth Hub'));
 add('b',mk('div',null,mk('div',{style:'font-weight:700;font-size:15px'},'Assalam o Alaikum! 👋 LinkedIn Viral Studio v3: ab reach + client hunting ke saath.'),mk('div',{className:'tip',style:'margin-top:6px;white-space:pre-wrap;font-size:13px'},'1) 🚀 Growth Hub → Profile: apna niche, services aur ideal clients likhein (sirf ek dafa).\n2) Topic likhein ya 🎲 dabayein. Har dafa naya formula, nayi awaaz, naya design, aap ke clients ke liye.\n3) Har post ke saath Viral score, 3 hooks aur first comment milta hai.\n4) "Post to LinkedIn" (Worker) ya "Open in LinkedIn" (1 click) se post karein, ya ⏰ schedule karein.\n5) 💬 Comments tab se doosron ki posts par smart comments, 🎯 Client Hunter se leads aur DMs.'),cfg.key?null:mk('div',{className:'tip',style:'margin-top:6px'},'💡 Best (insaan jaisi, har baar alag) posts ke liye Settings mein FREE Gemini API key lagayein: aistudio.google.com/apikey'),sug))})();
 /*V3_END*/
+</script>
+<script>
+/*V4_START — research-trained update (Nov 2026): 360Brew topic authority, comment-bait penalty, 0-3 hashtags,
+  U-curve length, short number hooks, carousel PDFs, golden hour, human stories bank. Sources listed in Playbook tab.*/
+const KB={
+hook:'First line 3 to 9 words. Best performers carry a specific number or an unresolved tension. Do NOT open with a question (question-first lines get fewer likes in 1M+ post studies). No "I\'m excited to announce".',
+fold:'Line 1 + line 2 under 140 characters, because mobile cuts to "...see more" around 140-210 characters.',
+length:'Long posts win dwell time: 1,300 to 2,200 characters. Very short (under 300) also works for a single sharp opinion.',
+cta:'NEVER ask people to "comment YES", "comment KEYWORD", "type X below" or "agree?". In 2026 LinkedIn cuts reach of comment-bait posts roughly in half. End with ONE genuine, specific open question that needs a thoughtful answer (not yes/no).',
+tags:'0 to 3 niche hashtags on the last line. More hashtags do not help reach.',
+links:'No external links in the post. Put links in the first comment.',
+topic:'360Brew ranks authors by topic authority: stay inside the author\'s niche and pillars and tie the topic back to their expertise.',
+save:'Make it save-worthy: include a concrete checklist, framework, steps or example worth coming back to.',
+human:'Generic AI-sounding posts are demoted. Sound like a specific person with real experience.'};
+
+/* ----- prompt ----- */
+v3Prompt=function(t,f,ang,avoid){const voice=fresh(VOICES,'voice'),open=fresh(OPENERS.filter(x=>x!=='a sharp question'),'open');return `You are a top LinkedIn ghostwriter. Your posts sound 100% human, regularly reach 100k+ people and bring inbound clients to freelancers, consultants and agencies. Readers must never feel the post was written by AI or from a template.
+
+AUTHOR
+- Name: ${cfg.name}
+- Headline: ${cfg.role||'-'}
+- Niche: ${BR.niche||'-'}
+- Content pillars: ${pil().join('; ')||'-'}
+- Services: ${BR.services||'-'}
+- Ideal client (write FOR them): ${BR.audience||'-'}
+- Offer: ${BR.offer||'none, use a soft "my DMs are open" line'}
+- Real proof you may mention: ${BR.proof||'NONE. Do not claim any client results, numbers or names.'}
+- Real stories/experiences of the author you may use: ${BR.stories||'NONE. Do not invent personal events; use "I keep seeing..." framing instead.'}
+- Tone: ${BR.tone||'friendly expert'}
+
+THIS POST
+- Topic: "${t}"${ang?`\n- Specific angle: "${ang}"`:''}
+- Format: ${FDESC[f]||FDESC.listicle}
+- Goal: ${GDESC[BR.goal]||GDESC.leads}
+- Voice for this post: ${voice}
+- Open with: ${open}
+- Language: ${LNm()}
+
+RESEARCH-BACKED LINKEDIN RULES (2026, follow strictly)
+1. HOOK: ${KB.hook}
+2. FOLD: ${KB.fold}
+3. LENGTH: ${f==='opinion'?'Under 700 characters for this discussion format.':KB.length}
+4. STRUCTURE: one idea per line, 1-2 line paragraphs, white space. ${KB.save}
+5. CTA: ${KB.cta} ${BR.goal==='leads'?'For this lead goal add one soft line after the question, like "If you\'re dealing with this, my DMs are open."':''} ${f==='magnet'?'For the lead magnet format, say the resource is in the first comment (never comment-gated).':''}
+6. HASHTAGS: ${KB.tags}
+7. LINKS: ${KB.links}
+8. TOPIC AUTHORITY: ${KB.topic}
+9. HUMAN VOICE: ${KB.human} Use contractions, vary sentence length, include at least one concrete specific detail (a tool, a small scene, a precise step). No em dashes. Max 3 emojis. Banned: "In today's fast-paced world", "game-changer", "delve", "unlock", "leverage", "elevate", "navigate", "landscape", "seamless", "robust", "harness", "Here's the thing", "Let that sink in", "Let's dive in", "In conclusion", "It's not just X, it's Y", "buckle up", "excited to announce".
+10. TRUTH: never invent statistics, studies, client names or results.
+11. FRESHNESS: clearly different from these recent headlines: ${avoid||'none'}.
+
+Also create a 7-slide carousel version (document posts get the highest engagement on LinkedIn) and art-direct a poster.
+
+Return ONLY valid JSON with exactly these keys:
+{"headline":"poster headline, max 9 words","points":["6 short takeaways, each under 80 characters"],"labels":["8 labels of 1-2 words"],"post":"the full post text with line breaks and 0-3 hashtags","hooks":["3 alternative first lines, 3-9 words, statements not questions, at least one with a number"],"first_comment":"comment the author posts under their own post right after publishing: a bonus tip, or the resource for a lead magnet (use [link] as placeholder), under 280 characters, no hashtags","slides":[{"title":"max 8 words","body":"max 180 characters"}],"mood":"one of electric|sunset|aurora|mono|candy|forest|gold|ocean|neon|paper","hue":0,"stat":{"value":"short big figure that is certainly true, e.g. '5 steps'","label":"caption under 60 characters"},"quote":"one memorable original line under 100 characters","image_prompt":"English description of an abstract or symbolic cinematic background for this topic, no text, no people, no logos"}`};
+aiText3=async function(msg,which,f,ang){const t=topicOf(msg),avoid=(LS.get('vs_used')||[]).slice(-8).join(' | '),pr=v3Prompt(t,f,ang,avoid);
+const o=jparse(which==='gemini'?await callGemini(pr):await callOllama(pr));
+if(!o||typeof o.post!=='string'||o.post.length<(f==='opinion'?120:300)||!o.headline)throw new Error('AI ka jawab adhura tha');
+const pts=(Array.isArray(o.points)?o.points:[]).map(x=>String(x).slice(0,110)).filter(Boolean),lb=(Array.isArray(o.labels)?o.labels:[]).map(x=>String(x).slice(0,22)).filter(Boolean);
+const st=o.stat&&o.stat.value?{value:String(o.stat.value).slice(0,12),label:String(o.stat.label||'').slice(0,70)}:null;
+const u=LS.get('vs_used')||[];u.push(String(o.headline).slice(0,80));LS.set('vs_used',u.slice(-14));
+const txt=fixTags(o.post.replace(/\\n/g,'\n').replace(/\s*—\s*/g,', ').trim());
+const sl=(Array.isArray(o.slides)?o.slides:[]).filter(x=>x&&x.title).map(x=>({t:String(x.title).slice(0,70),b:String(x.body||'').slice(0,240)})).slice(0,10);
+return{text:txt,slides:sl.length>=4?sl:null,d:{headline:String(o.headline).slice(0,90),points:pts,labels:lb.length>=8?lb.slice(0,8):null,quote:o.quote?String(o.quote).slice(0,130):null,stat:st},art:{mood:String(o.mood||'').toLowerCase(),hue:o.hue},imgp:o.image_prompt?String(o.image_prompt).slice(0,300):null,
+hooks:(Array.isArray(o.hooks)?o.hooks:[]).map(x=>String(x).trim()).filter(Boolean).slice(0,3),fc:o.first_comment?String(o.first_comment).slice(0,400):''}};
+function fixTags(t){const L=t.replace(/\s+$/,'').split('\n'),i=L.length-1;if(/^\s*#/.test(L[i]||'')){const tg=(L[i].match(/#[\p{L}\p{N}_]+/gu)||[]).slice(0,3);L[i]=tg.join(' ');if(!tg.length)L.pop()}return L.join('\n').replace(/\n{3,}/g,'\n\n')}
+
+/* ----- offline templates: research updates ----- */
+LX.en.g.want=()=>['I put the full checklist in the first comment.','The full checklist is in the first comment below.'];
+LX.ru.g.want=()=>['Poori checklist pehle comment mein hai.','Mukammal checklist neeche pehle comment mein rakh di hai.'];
+LX.en.g.vote=['Which one would you pick, and why?','Where do you land on this, and what made you choose it?'];
+LX.ru.g.vote=['Aap kaun sa chunenge, aur kyun?','Aap ka faisla kya hoga, aur kis wajah se?'];
+LX.en.cta.leads=(t,A,k,o)=>fresh([`What's slowing down your ${t} the most right now?\n\nIf you're one of the ${A} dealing with this, my DMs are open${o?`. Happy to offer ${o}`:''}.`,`Curious: what have you already tried with ${t}, and what happened?\n\nIf you want a second pair of eyes on it, send me a DM${o?` for ${o}`:''}.`],'cl4');
+LX.ru.cta.leads=(t,A,k,o)=>fresh([`${t} mein is waqt aap ko sab se zyada kya rok raha hai?\n\nAgar aap ${A} mein se hain aur ye masla hai, to DM khula hai${o?`, ${o} ke liye bhi`:''}.`,`${t} ke liye aap ab tak kya try kar chuke hain, aur natija kya raha?\n\nKisi doosri nazar ki zaroorat ho to DM kar dein${o?`, ${o} ke liye`:''}.`],'cl4r');
+LX.en.cta.reach=t=>fresh([`What's one ${t} lesson you had to learn the hard way?`,`Which of these would you add to (or cut from) the list, and why?`,`What would you tell someone starting with ${t} tomorrow?`],'v4c');
+LX.ru.cta.reach=t=>fresh([`${t} ka kaun sa sabaq aap ne mushkil se seekha?`,`Is list mein aap kya add ya kam karenge, aur kyun?`],'v4cr');
+['story','contrarian','case','bts','beforeafter','magnet'].forEach(k=>{const o=LX.en.h[k];LX.en.h[k]=(t,n,A)=>o(t,n,A).concat({story:[`1 ${t} lesson I learned the hard way.`],contrarian:[`${cap(t)} advice in 1 line: do less.`],case:[`1 ${t} problem. 3 fixes. Here they are.`],bts:[`My ${t} process in 5 steps.`],beforeafter:[`${cap(t)}: 4 differences that change everything.`],magnet:[`A 7-point ${t} checklist, free.`]}[k])});
+const _l3=local3;local3=function(msg,f){const r=_l3(msg,f);const L=r.text.split('\n');if(/[?؟]\s*$/.test(L[0]||'')&&r.hooks&&r.hooks.length){const q=L[0],hq=TXT[lang].hq('');L[0]=r.hooks[0];r.hooks[0]=q;r.d.headline=L[0].replace(/[:.]+$/,'');for(let i=L.length-1;i>0;i--)if(hq.includes(L[i].trim()))L.splice(i,1)}r.text=fixTags(L.join('\n'));r.tags=(r.text.match(/#[\p{L}\p{N}_]+/gu)||[]);if(f==='magnet')r.fc=(lang==='en'?'Here is the full checklist: [link]\n\n':'Mukammal checklist yahan hai: [link]\n\n')+r.fc;return r};
+
+/* ----- viral score v4 ----- */
+const BAIT=/comment\s+["“'‘]?[A-Z]{2,}["”'’]?|comment\s+(yes|below if|if you agree|agree)|type\s+["“'‘]?\w+["”'’]?\s+(below|in the comments)|drop\s+(a|an)\s+["“'‘]?\w+["”'’]?\s+(below|in the comments)|"comment"\s+and\s+i('|’)ll/i;
+scorePost=function(t){const L=t.split('\n'),first=(L.find(x=>x.trim())||'').trim(),two=L.filter(x=>x.trim()).slice(0,2).join(' '),words=first.split(/\s+/).filter(Boolean).length,len=t.length,tags=(t.match(/#[\p{L}\p{N}_]+/gu)||[]).length,ln=L.filter(x=>x.trim()),avg=ln.reduce((a,x)=>a+x.length,0)/Math.max(1,ln.length),tail=t.replace(/#[\p{L}\p{N}_]+/gu,'').trim().slice(-450),q=/[?؟]/.test(tail),link=/https?:\/\//i.test(t),cta=/\b(dm|dms|message|inbox|follow|reach out|chat)\b|فالو/i.test(t),you=(t.match(/\b(you|your|aap|ap)\b|آپ/gi)||[]).length,em=(t.match(/\p{Extended_Pictographic}/gu)||[]).length,ai=(t.match(/\b(game-?changer|delve|unlock|leverage|elevate|seamless|robust|harness|landscape|fast-paced|excited to announce)\b|—/gi)||[]).length;
+let s=0;const tips=[],ck=(ok,p,tip)=>{if(ok)s+=p;else tips.push(tip)};
+ck(BAIT.test(t)===false,14,'"Comment YES / keyword" wali CTA hatayein: 2026 mein aisi posts ki reach takreeban aadhi ho jati hai. Asli sawal poochein.');
+ck(first.length>0&&first.length<=70&&words<=10,14,'Hook (pehli line) 10 lafzon / 70 characters se chhota karein.');
+ck(!/[?؟]\s*$/.test(first),5,'Pehli line sawal na ho: statement ya number wale hooks zyada chalte hain.');
+ck(/\d/.test(two),5,'Pehli 2 lines mein ek specific number dalein (jaise "3 ghaltiyan", "5 steps").');
+ck(len<=300||(len>=1200&&len<=2600),13,'Length: ya bohat chhoti (300 se kam) ya lambi (1,200–2,600) rakhein. Beech wali kam chalti hai. Abhi '+len+'.');
+ck(avg<=95,7,'Lines chhoti karein: har line mein ek idea.');
+ck(q,12,'Aakhir mein ek asli, specific sawal poochein (haan/na wala nahi).');
+ck(cta,8,'Soft CTA dalein: "DMs open hain" ya "Follow for more".');
+ck(tags<=3,6,'Hashtags 0–3 rakhein (abhi '+tags+').');
+ck(!link,6,'Link post mein na dalein, first comment mein dalein.');
+ck(you>=2,4,'Reader se baat karein: "you / aap" zyada use karein.');
+ck(em<=5,3,'Emojis 5 se kam rakhein, warna post AI jaisi lagti hai.');
+ck(ai===0,3,'AI jaise lafz hatayein (game-changer, unlock, leverage, em-dash —).');
+return{s:Math.min(100,s),tips}};
+
+/* ----- topic authority check ----- */
+function topicFit(t){const P=[...pil(),BR.niche,BR.services].join(' ').toLowerCase();if(!P.trim())return true;const stop=/^(the|and|for|with|what|how|why|your|you|are|this|that|from|about|today|best|tips|kya|kaise|hai|ke|ki|ka|mein|aur)$/i,ws=(String(t).toLowerCase().match(/[\p{L}]{3,}/gu)||[]).filter(x=>!stop.test(x));return !ws.length||ws.some(x=>P.includes(x.slice(0,Math.min(5,x.length))))}
+
+/* ----- carousel (PDF document post) ----- */
+function loadJsPDF(){if(window.jspdf)return Promise.resolve(window.jspdf);return new Promise((ok,no)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';s.onload=()=>window.jspdf?ok(window.jspdf):no(new Error('PDF library load nahi hui'));s.onerror=()=>no(new Error('PDF library load nahi hui (internet check karein)'));document.head.appendChild(s)})}
+function carSlides(r){let mid;if(r.slides&&r.slides.length>=4){mid=r.slides.slice(1,-1);if(mid.length<3)mid=r.slides.slice()}else{const ls=r.text.split('\n').map(x=>x.trim()).filter(Boolean).slice(1).filter(l=>!/^#/.test(l)&&!/^P\.S\./i.test(l)&&!/[?؟]\s*$/.test(l)&&!/\b(dm|dms|dm karein)\b/i.test(l));mid=[];let hd='';
+for(let i=0;i<ls.length;i++){const l=ls[i],nx=ls[i+1]||'';if(/[:：]$/.test(l)&&l.length<60){hd=l.replace(/[:：]$/,'');continue}
+if(/^(❌|Myth:|Before:|Pehle:)/.test(l)&&nx&&/^(✅|Fact:|After:|Baad:)/.test(nx)){mid.push({t:l,b:nx});i++;continue}
+const cl=l.replace(/^(\d+[.)]|→|•|✅|💡|Step \d+:)\s*/,'');if(cl.length>8)mid.push({t:hd&&!mid.some(x=>x.h===hd)?hd:'',h:hd,b:cl})}
+mid=mid.filter(x=>(x.t+x.b).length>8)}
+const cover={k:'cover',t:r.d.headline||r.text.split('\n')[0],b:''},end={k:'cta',t:{en:'Found this useful?',ru:'Faida hua?',ur:'فائدہ ہوا؟'}[lang],b:{en:`♻️ Repost to help your network\n🔔 Follow ${cfg.name} for more on ${BR.niche||'this'}\n💬 My DMs are open`,ru:`♻️ Repost karein\n🔔 Mazeed ke liye ${cfg.name} ko follow karein\n💬 DM khula hai`,ur:`♻️ ری پوسٹ کریں\n🔔 مزید کے لیے ${cfg.name} کو فالو کریں`}[lang]};
+return[cover,...mid.slice(0,8).map(x=>Object.assign({k:'mid'},x)),end]}
+function drawSlide(cv,r,s,i,n){const W=1080,H=1350;cv.width=W;cv.height=H;const c=cv.getContext('2d'),S=r.car||(r.car=(r.d.spec||mkSpec(r.art))),P=S.pal,rtl=lang==='ur',keep=SC;SC=1;try{
+BGS[S.bg](c,W,H,P,rng(S.seed+i*7));c.fillStyle=K(P.dk||[0,0,0],P.dark?.45:.12);c.fillRect(0,0,W,H);
+const u=1,F={h:S.fam.h,s:S.fam.s,w:S.fam.w,up:S.fam.up,rtl},m=88,cw=W-2*m,al=rtl?'right':'left',x=rtl?W-m:m;c.direction=rtl?'rtl':'ltr';c.textBaseline='top';
+c.font=`700 ${26}px ${F.s}`;c.fillStyle=K(P.mu);c.textAlign=rtl?'left':'right';c.fillText(`${i+1} / ${n}`,rtl?m:W-m,m);
+if(s.k==='cover'){badge(c,{en:'Swipe →',ru:'Swipe karein →',ur:'← سوائپ کریں'}[lang],x,m-6,P,u,al,F.s);head(c,s.t,x,H*.24,cw,H*.46,P,{fam:F.h,wt:F.w,s0:132,up:F.up,hl:2,mn:44,al})}
+else if(s.k==='cta'){const y=head(c,s.t,x,H*.22,cw,H*.22,P,{fam:F.h,wt:F.w,s0:110,up:F.up,hl:1,mn:40,al});c.font=`600 ${42}px ${F.s}`;c.fillStyle=K(P.tx);c.textAlign=al;let yy=y+50;s.b.split('\n').forEach(l=>{glass(c,m,yy-18,cw,96,30,P);c.fillStyle=K(P.tx);c.fillText(l,rtl?W-m-34:m+34,yy+8);yy+=126})}
+else{c.font=`900 ${150}px ${F.h}`;c.fillStyle=gradFill(c,P,m,m+300);c.textAlign=al;c.fillText(String(i).padStart(2,'0'),x,m+40);let y=m+230;if(s.t)y=head(c,s.t,x,y,cw,H*.3,P,{fam:F.h,wt:F.w,s0:84,up:0,hl:1,mn:38,al})+34;
+const fb=H-260,bs=s.t?46:58;c.font=`${s.t?500:700} ${bs}px ${F.s}`;const bl=wrap(c,String(s.b||''),cw-80).slice(0,Math.floor((fb-y-60)/(bs*1.35)));if(bl.length){glass(c,m,y,cw,bl.length*bs*1.35+70,34,P,1);c.fillStyle=K(P.tx);c.textAlign=al;let yy=y+35;bl.forEach(l=>{c.fillText(l,rtl?x-40:x+40,yy);yy+=bs*1.35})}
+c.fillStyle=K(P.tx,.15);rr(c,m,H-215,cw,8,4);c.fill();c.fillStyle=gradFill(c,P,m,m+cw);rr(c,m,H-215,cw*(i+1)/n,8,4);c.fill()}
+brandFoot(c,W,H,P,u,F);finish(c,W,H,P,{ng:true})}finally{SC=keep}}
+function saveFile(blob,name){let d=null;(async()=>{try{d=window.claude?await claude.use('downloads'):null}catch(e){}if(d){try{await d.save({filename:name,data:blob})}catch(e){}}else{const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),3000)}})()}
+async function makeCarousel(r){const sl=carSlides(r),n=sl.length,strip=mk('div',{style:'display:flex;gap:8px;overflow-x:auto;padding:6px 0'}),cvs=sl.map((s,i)=>{const cv=document.createElement('canvas');drawSlide(cv,r,s,i,n);cv.style.cssText='height:230px;width:auto;border-radius:8px;flex:none;border:1px solid var(--bd)';strip.appendChild(cv);return cv});
+const dl=mk('button',{className:'p'},'⬇ Download Carousel PDF'),msg=mk('div',{className:'tip'});dl.onclick=async()=>{dl.disabled=true;msg.textContent='PDF ban rahi hai…';try{const{jsPDF}=await loadJsPDF(),pdf=new jsPDF({orientation:'portrait',unit:'px',format:[1080,1350],hotfixes:['px_scaling'],compress:true});cvs.forEach((cv,i)=>{if(i)pdf.addPage([1080,1350],'portrait');pdf.addImage(cv.toDataURL('image/jpeg',.9),'JPEG',0,0,1080,1350)});saveFile(pdf.output('blob'),'linkedin-carousel.pdf');msg.textContent='✅ PDF download ho gayi.'}catch(e){msg.textContent='PDF nahi bani: '+(e.message||e)}dl.disabled=false};
+const reg=mk('button',null,'🎨 New style');reg.onclick=()=>{r.car=mkSpec(r.art);cvs.forEach((cv,i)=>drawSlide(cv,r,sl[i],i,n))};
+add('b',mk('div',null,mk('div',{style:'font-weight:700'},'📑 Carousel ('+n+' slides): document posts LinkedIn par sab se zyada engagement lete hain.'),strip,mk('div',{className:'row'},dl,reg,mk('button',{on:{click:()=>openComposer(r.text,null)}},'Open in LinkedIn')),msg,mk('div',{className:'tip',style:'white-space:pre-wrap'},'Post kaise karein: LinkedIn → Start a post → ➕ (More) → Add a document → PDF upload → document ka title dein → upar wala caption paste karein → Post.')))}
+
+/* ----- golden hour ----- */
+let GH_T=[];function goldenHour(){GH_T.forEach(clearTimeout);GH_T=[];add('b',mk('div',null,mk('div',{style:'font-weight:700'},'⏱ Golden hour shuru: agle 60–90 minute sab se ahem hain'),mk('div',{className:'tip',style:'white-space:pre-wrap'},'• Foran first comment karein (bonus tip ya link)\n• Har comment ka 2–3 line ka reply dein; threaded replies se reach barhti hai\n• Is dauran 3–4 doosri posts par value wale comments karein\n• Post edit na karein aur foran doosri post na dalein')));
+GH_T.push(setTimeout(()=>add('b','⏱ 15 minute ho gaye: comments check karein aur har ek ka reply dein.'),15*60e3),setTimeout(()=>add('b','⏱ 60 minute ho gaye: aakhri round of replies karein. Reach ka bara hissa ab tay ho chuka hai.'),60*60e3))}
+const _oc=openComposer;openComposer=function(t,cv){_oc(t,cv);goldenHour()};
+const _pl=postLI3;postLI3=async function(b,r){await _pl(b,r);if(b.textContent==='Posted ✅')goldenHour()};
+
+/* ----- render additions ----- */
+const _rp=renderPost;renderPost=function(r,msg,tp,note,F,ang){_rp(r,msg,tp,note,F,ang);const box=$('#chat').lastElementChild;if(!box)return;const row=[...box.querySelectorAll('.row')].find(x=>/Copy Post/.test(x.textContent));
+if(row&&r.d.style!=='hiring'){const b=mk('button',{className:'p'},'📑 Carousel PDF');b.onclick=()=>makeCarousel(r);row.insertBefore(b,row.children[3]||null)}
+if(!topicFit(tp)){const n=mk('div',{className:'tip',style:'color:#d97706;margin-top:6px'},'⚠️ Ye topic aap ke niche/pillars se bahar lagta hai. LinkedIn (360Brew) un authors ko zyada reach deta hai jo 2–3 topics par mustaqil likhte hain. Growth Hub → Profile mein pillars check karein.');box.firstElementChild.appendChild(n)}};
+
+/* ----- Growth Hub additions ----- */
+renderGH=function(){$('#gtabs').replaceChildren(...[['profile','👤 Profile'],['ideas','💡 Content Plan'],['comments','💬 Comments'],['clients','🎯 Client Hunter'],['queue','⏰ Schedule'],['playbook','📚 Playbook']].map(([k,l])=>mk('span',{className:'chip'+(GT===k?' on':''),on:{click:()=>{GT=k;renderGH()}}},l)));$('#gbody').replaceChildren(GHT[GT]())};
+const _gp=GHT.profile;GHT.profile=function(){const el=_gp(),st=tax(BR.stories||'','Aap ke asli tajurbe, har line par ek. Jaise: "Pehla client Fiverr se mila tha", "Ek restaurant ki website 2 hafte mein banayi". AI sirf yehi kahaniyan use karega, apni taraf se nahi gharega.',4);st.addEventListener('input',()=>{BR.stories=st.value.trim();LS.set('vs_brand',BR)});
+const sec=el.querySelector('.sec'),n=pil().length,warn=n>4?mk('div',{className:'tip',style:'color:#d97706'},'⚠️ Aap ke '+n+' pillars hain. Research ke mutabiq 2–3 related topics par 60–90 din mustaqil likhne se topic authority banti hai.'):null;
+el.insertBefore(mk('div',null,fldx('Aap ki asli kahaniyan / tajurbe (posts ko insaan jaisa banate hain)',st),warn,mk('div',{className:'tip'},'Tip: apni LinkedIn headline aur About bhi inhi topics par rakhein. LinkedIn post ko profile se match karta hai.')),sec);return el};
+const _gc=GHT.clients;GHT.clients=function(){const el=_gc(),t=[...el.querySelectorAll('.tip')].pop();if(t)t.textContent='• 1 post: Tue–Thu, subah 8–10 ya 11–2 baje (aap ke audience ke time zone mein)\n• Post ke baad golden hour: first comment + har comment ka reply (60–90 min)\n• 3–4 soch samajh kar comments rozana (15–20 hafte mein; is se zyada ka faida kam hota hai)\n• 3 buyer-intent searches (upar), helpful comment + DM\n• 5–10 personal connection requests note ke saath\n• Engagement pods, bots, auto-DM tools kabhi nahi: LinkedIn reach kaat deta hai ya account restrict karta hai';return el};
+GHT.playbook=function(){const R_=[['🎣 Hook','Pehli line 3–9 lafz, specific number ya adhoori tension. Sawal se shuru na karein. Pehli 2 lines 140 characters se kam.'],['📏 Length','1,300–2,200 characters (dwell time) ya 300 se kam ek tez opinion. Beech wali length sab se kam chalti hai.'],['🚫 Comment-bait','"Comment YES / keyword" CTA par 2026 mein reach ~aadhi. Asli, specific sawal poochein. Lead magnet first comment ya DM mein dein.'],['#️⃣ Hashtags','0–3 niche hashtags. Zyada se faida nahi.'],['🔗 Links','Post mein link na dalein; first comment mein dalein.'],['📑 Format','Carousel / PDF document posts ka engagement sab se zyada, phir images. Video ka reach kam hua hai.'],['🧠 Topic authority','360Brew aap ki profile aur pichli posts dekh kar topic authority tay karta hai. 2–3 pillars, 60–90 din mustaqil.'],['🤖 AI content','Generic AI posts ki reach kam hoti hai. Apni kahaniyan, asli details aur apni awaaz dalein.'],['💬 Comments','Likes se zyada comments, aur comments se zyada saves ahem. Pehle 60–90 min mein har comment ka reply. Rozana 3–4 achi comments doosron par.'],['⏰ Waqt','Tue–Thu, subah 8–10 ya 11–2 baje. Weekend kamzor. Apni analytics se test karein.']];
+const SRC=[['SocialPilot: LinkedIn algorithm 2026','https://www.socialpilot.co/blog/linkedin-algorithm'],['Buffer: 52M posts engagement study','https://buffer.com/resources/state-of-social-media-engagement-2026/'],['AuthoredUp: best performing content','https://authoredup.com/blog/best-performing-content-on-linkedin'],['MagicPost: comment-bait reach study','https://magicpost.in/studies/linkedin-comment-bait'],['MagicPost: hooks across 1.2M posts','https://magicpost.in/blog/linkedin-hooks'],['Ordinal: post length study','https://www.tryordinal.com/blog/linkedin-post-size'],['Ordinal: link penalty study','https://www.tryordinal.com/blog/linkedin-link-penalty-study'],['Scott Partnership: 360Brew guide','https://www.scottpr.com/linkedins-360brew-algorithm-the-b2b-guide-to-organic-reach-in-2026/'],['Ligo Social: comments case study','https://ligosocial.com/blog/linkedin-comment-impressions-data-backed-strategies-for-consultants-and-founders-to-win-clients-case-study'],['Sprout Social: best times 2026','https://sproutsocial.com/insights/best-times-to-post-on-linkedin/']];
+return mk('div',null,mk('p',{className:'mut'},'Ye tool in rules par train kiya gaya hai (research: November 2026). Har post, score aur tip inhi par chalti hai. Zyada tar data third-party studies ka hai, LinkedIn ka official nahi, is liye apni analytics se bhi check karte rahein.'),...R_.map(([h,b])=>mk('div',{className:'sec'},mk('h4',null,h),mk('div',{className:'tip',style:'font-size:13px'},b))),mk('div',{className:'sec'},mk('h4',null,'Sources'),...SRC.map(([l,u])=>mk('div',null,mk('a',{href:u,target:'_blank',rel:'noopener',style:'font-size:12px;color:var(--ac)'},l)))))};
+document.title='LinkedIn Viral Studio Pro v4';
+/*V4_END*/
 </script>
 </body>
 </html>
