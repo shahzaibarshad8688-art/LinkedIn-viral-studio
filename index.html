@@ -322,7 +322,7 @@ c.fillText(cfg.name,m,H-m-(cfg.showRole&&cfg.role?W*.05:W*.03));
 if(cfg.showRole&&cfg.role){c.globalAlpha=.65;c.font=`400 ${Math.round(W*.022)}px ${F}`;c.fillText(cfg.role,m,H-m-W*.015)}c.globalAlpha=1}
 function add(cls,html){const e=document.createElement('div');e.className='m '+cls;if(html instanceof Node)e.appendChild(html);else e.textContent=html;$('#chat').appendChild(e);$('#chat').scrollTop=1e9;return e}
 async function copy(t){try{await navigator.clipboard.writeText(t)}catch(e){const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy')}catch(_){}a.remove()}}
-async function postLI(b,r,cv){if(!cfg.wurl||!cfg.wkey){openSt();add('b','Pehle Settings mein Worker URL aur App Key bharein, phir Connect LinkedIn dabayein.');return}
+async function postLI(b,r,cv){if(!canPost()){openSt();add('b','Pehle Settings mein Worker URL aur App Key bharein, phir Connect LinkedIn dabayein.');return}
 if(b.disabled)return;b.disabled=true;const old=b.textContent;b.textContent='Posting…';
 try{const res=await fetch(cfg.wurl+'/post',{method:'POST',headers:{'Content-Type':'application/json','X-App-Key':cfg.wkey},body:JSON.stringify({text:r.text,image:cv.toDataURL('image/png').split(',')[1],alt:r.d.headline})});
 const j=await res.json().catch(()=>({}));if(!res.ok)throw new Error(j.error||('HTTP '+res.status));
@@ -959,7 +959,7 @@ function scoreEl(t){const{s,tips}=scorePost(t),col=s>=80?'#16a34a':s>=60?'#d9770
 async function postRaw(text,cv,alt){const res=await fetch(cfg.wurl+'/post',{method:'POST',headers:{'Content-Type':'application/json','X-App-Key':cfg.wkey},body:JSON.stringify({text,image:cv.toDataURL('image/png').split(',')[1],alt:alt||''})});const j=await res.json().catch(()=>({}));if(!res.ok)throw new Error(j.error||('HTTP '+res.status));return j}
 function openComposer(text,cv){window.open('https://www.linkedin.com/feed/?shareActive=true&text='+encodeURIComponent(text),'_blank','noopener');copy(text);if(cv)saveImg(cv);add('b','LinkedIn composer khul gaya. Text bhara hua hai (clipboard mein bhi copy hai, agar khali dikhe to Ctrl+V karein). Image download ho gayi: composer mein 🖼 icon se attach karke Post dabayein.')}
 function noWorker(){return mk('div',null,'Direct auto-post ke liye LinkedIn Worker chahiye (Settings → Worker URL + App Key → Connect LinkedIn). Us ke bagair bhi "Open in LinkedIn" button 1 click mein composer khol deta hai.',mk('div',{className:'row'},mk('button',{on:{click:openSt}},'Worker settings')))}
-async function postLI3(b,r){if(!cfg.wurl||!cfg.wkey){add('b',noWorker());return}if(b.disabled)return;b.disabled=true;const o=b.textContent;b.textContent='Posting…';
+async function postLI3(b,r){if(!canPost()){add('b',noWorker());return}if(b.disabled)return;b.disabled=true;const o=b.textContent;b.textContent='Posting…';
 try{const j=await postRaw(r.text,exportSmall(r.d),r.d.headline);b.textContent='Posted ✅';const m=mk('div',null,'LinkedIn par post ho gayi ✅ '+(j.url||''));if(r.fc){const c=mk('button',{className:'p'},'Copy first comment');c.onclick=async()=>{await copy(r.fc);c.textContent='Copied ✓'};m.append(mk('div',{className:'tip',style:'margin-top:6px'},'Ab foran ye first comment apni post par karein. Pehle 60 minute ka engagement reach decide karta hai:'),mk('div',{style:'white-space:pre-wrap;margin:6px 0'},r.fc),c)}add('b',m)}
 catch(e){b.disabled=false;b.textContent=o;add('b','Post nahi hui: '+e.message+'. "Open in LinkedIn" button se bhi post kar sakte hain.')}}
 
@@ -969,9 +969,9 @@ function nextSlot(){const d=new Date();for(let i=0;i<9;i++){const x=new Date(d);
 const dtl=x=>{const p=n=>String(n).padStart(2,'0');return `${x.getFullYear()}-${p(x.getMonth()+1)}-${p(x.getDate())}T${p(x.getHours())}:${p(x.getMinutes())}`};
 function qAdd(r,when){const d=Object.assign({},r.d);delete d.bgImg;QU=LS.get('vs_queue')||[];QU.push({id:Date.now()+''+Math.floor(Math.random()*999),text:r.text,d,when,st:'wait',fc:r.fc||''});saveQ()}
 function qOpen(q){openComposer(q.text,exportSmall(q.d))}
-async function qPostNow(id){QU=LS.get('vs_queue')||[];const q=QU.find(x=>x.id===id);if(!q)return;if(!cfg.wurl||!cfg.wkey){qOpen(q);q.st='done';saveQ();return}try{await postRaw(q.text,exportSmall(q.d),q.d.headline);q.st='done';add('b','✅ Scheduled post LinkedIn par chali gayi.'+(q.fc?'\n\nFirst comment:\n'+q.fc:''))}catch(e){q.st='fail';add('b','⚠️ Post fail: '+e.message)}saveQ()}
+async function qPostNow(id){QU=LS.get('vs_queue')||[];const q=QU.find(x=>x.id===id);if(!q)return;if(!canPost()){qOpen(q);q.st='done';saveQ();return}try{await postRaw(q.text,exportSmall(q.d),q.d.headline);q.st='done';add('b','✅ Scheduled post LinkedIn par chali gayi.'+(q.fc?'\n\nFirst comment:\n'+q.fc:''))}catch(e){q.st='fail';add('b','⚠️ Post fail: '+e.message)}saveQ()}
 async function qTick(){QU=LS.get('vs_queue')||[];const now=Date.now();let ch=false;for(const q of QU){if(q.st!=='wait'||q.when>now)continue;ch=true;
-if(BR.auto&&cfg.wurl&&cfg.wkey){try{await postRaw(q.text,exportSmall(q.d),q.d.headline);q.st='done';add('b','⏰ Scheduled post khud LinkedIn par post ho gayi ✅'+(q.fc?'\n\nAb ye first comment karein:\n'+q.fc:''))}catch(e){q.st='fail';add('b','⏰ Scheduled post fail: '+e.message)}}
+if(BR.auto&&canPost()){try{await postRaw(q.text,exportSmall(q.d),q.d.headline);q.st='done';add('b','⏰ Scheduled post khud LinkedIn par post ho gayi ✅'+(q.fc?'\n\nAb ye first comment karein:\n'+q.fc:''))}catch(e){q.st='fail';add('b','⏰ Scheduled post fail: '+e.message)}}
 else{q.st='due';add('b',mk('div',null,'⏰ Post ka waqt ho gaya: "'+q.text.split('\n')[0]+'"',mk('div',{className:'row'},mk('button',{className:'p',on:{click:()=>qPostNow(q.id)}},'Post now'),mk('button',{on:{click:()=>qOpen(q)}},'Open in LinkedIn'))));try{document.title='🔔 Post time! · LinkedIn Viral Studio'}catch(e){}}}if(ch)saveQ()}
 setInterval(qTick,30000);setTimeout(qTick,4000);
 
@@ -1026,7 +1026,7 @@ function openGH(tab){if(tab)GT=tab;renderGH();$('#gp').classList.add('on')}
 function renderGH(){$('#gtabs').replaceChildren(...[['profile','👤 Profile'],['ideas','💡 Content Plan'],['comments','💬 Comments'],['clients','🎯 Client Hunter'],['queue','⏰ Schedule']].map(([k,l])=>mk('span',{className:'chip'+(GT===k?' on':''),on:{click:()=>{GT=k;renderGH()}}},l)));$('#gbody').replaceChildren(GHT[GT]())}
 const GHT={
 profile(){const f={niche:inpx(BR.niche,'Jaise: Web Development & AI Automation'),services:inpx(BR.services,'Comma se: website development, AI chatbots, Shopify stores'),audience:inpx(BR.audience,'Jaise: startup founders, restaurant owners, coaches'),offer:inpx(BR.offer,'Jaise: free 15-minute website audit (optional)'),proof:tax(BR.proof,'Sirf SACH results: jaise "40+ websites delivered". Khali chhor dein to AI koi result claim nahi karega.',2),tone:selx(BR.tone,[['friendly expert','Friendly expert'],['bold and direct','Bold & direct'],['storyteller','Storyteller'],['professional and polished','Professional'],['witty and casual','Witty & casual']]),goal:selx(BR.goal,GOALS),kw:inpx(BR.kw,'Jaise: AUDIT'),pillars:tax(BR.pillars,'Har line par ek topic',5)};
-const auto=mk('input',{type:'checkbox',checked:!!BR.auto}),ok=cfg.wurl&&cfg.wkey;
+const auto=mk('input',{type:'checkbox',checked:!!BR.auto}),ok=canPost();
 return mk('div',null,mk('p',{className:'mut'},'Ye info har post, comment aur DM mein use hoti hai taake content aap ke ideal clients ke liye bane. Jitna sahi bharenge, utne behtar leads.'),
 fldx('Aap ka niche',f.niche),fldx('Services jo aap bechte hain',f.services),fldx('Ideal clients (kis ke liye likhna hai)',f.audience),fldx('Offer / CTA (optional)',f.offer),fldx('Real proof / results (optional, kabhi fake na likhein)',f.proof),fldx('Tone',f.tone),fldx('Main goal',f.goal),fldx('Comment keyword (lead magnet / DM CTA)',f.kw),fldx('Content pillars: aap ke 3–6 main topics',f.pillars),
 mk('div',{className:'sec'},mk('h4',null,'🔗 LinkedIn connection'),mk('div',{className:'mut'},ok?'✅ Worker connected hai. "Post to LinkedIn" seedha post karega.':'Worker set nahi. Phir bhi "Open in LinkedIn" se 1 click mein post ho jati hai (text khud bhar jata hai, image download ho jati hai).'),mk('div',{className:'row'},mk('button',{on:{click:()=>{closeGH();openSt()}}},'Worker / API settings'),mk('button',{on:{click:()=>window.open('https://www.linkedin.com/feed/','_blank','noopener')}},'LinkedIn kholein')),mk('div',{className:'ck'},auto,mk('span',null,'Scheduled posts waqt par khud post hon (Worker zaroori, ye page khula ho)'))),
@@ -1254,6 +1254,30 @@ const SRC=[['SocialPilot: LinkedIn algorithm 2026','https://www.socialpilot.co/b
 return mk('div',null,mk('p',{className:'mut'},'Ye tool in rules par train kiya gaya hai (research: November 2026). Har post, score aur tip inhi par chalti hai. Zyada tar data third-party studies ka hai, LinkedIn ka official nahi, is liye apni analytics se bhi check karte rahein.'),...R_.map(([h,b])=>mk('div',{className:'sec'},mk('h4',null,h),mk('div',{className:'tip',style:'font-size:13px'},b))),mk('div',{className:'sec'},mk('h4',null,'Sources'),...SRC.map(([l,u])=>mk('div',null,mk('a',{href:u,target:'_blank',rel:'noopener',style:'font-size:12px;color:var(--ac)'},l)))))};
 document.title='LinkedIn Viral Studio Pro v4';
 /*V4_END*/
+</script>
+<script>
+/*V5_START — LinkedIn connection via the repo's server.js (OAuth on the server, no App Key). Falls back to the old Worker if set.*/
+let SRV=null;
+function canPost(){return !!((SRV&&SRV.connected)||(cfg.wurl&&cfg.wkey))}
+const LIERR={expired:'LinkedIn session khatam ho gayi. Dobara "Connect LinkedIn" karein.',rate:'Bohat jaldi dobara post. 10 second ruk kar try karein.',bad_request:'Post ya image theek format mein nahi (text 2,800 characters se kam hona chahiye).',upload:'Image LinkedIn par upload nahi hui. Dobara try karein.',publish:'LinkedIn ne post qabool nahi ki. Thori der baad try karein.',forbidden:'Security check fail. Page refresh karke try karein.'};
+function connectLI(){if(SRV&&SRV.configured){location.href='/auth/linkedin';return}
+if(SRV&&!SRV.configured){add('b','Server chal raha hai lekin LinkedIn keys set nahi. Hosting (Render) ke Environment mein LINKEDIN_CLIENT_ID, LINKEDIN_CLIENT_SECRET aur LINKEDIN_REDIRECT_URI dalein.');return}
+add('b',mk('div',null,'LinkedIn se seedha post sirf tab hoti hai jab ye studio aap ke apne server (repo ka server.js, jaise Render par) se khula ho. GitHub Pages ya file se khol kar sirf "Open in LinkedIn" chalta hai.',mk('div',{className:'row'},mk('button',{className:'p',on:{click:()=>window.open('https://github.com/shahzaibarshad8688-art/LinkedIn-viral-studio#readme','_blank','noopener')}},'Setup guide'))))}
+postRaw=async function(text,cv,alt){if(text.length>2800)throw new Error('Post 2,800 characters se lambi hai, thori chhoti karein');
+if(SRV&&SRV.connected){let r;try{r=await fetch('/api/linkedin/publish',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','X-Requested-With':'studio'},body:JSON.stringify({text,image:cv.toDataURL('image/png'),title:String(alt||'LinkedIn post').slice(0,100),alt:alt||''})})}catch(e){throw new Error('server tak pohanch nahi saka (internet ya server band)')}
+const j=await r.json().catch(()=>({}));if(!r.ok||!j.ok){if(j.code==='expired'){SRV.connected=false;liBadge()}throw new Error(LIERR[j.code]||('HTTP '+r.status))}return j}
+if(cfg.wurl&&cfg.wkey){let res;try{res=await fetch(cfg.wurl+'/post',{method:'POST',headers:{'Content-Type':'application/json','X-App-Key':cfg.wkey},body:JSON.stringify({text,image:cv.toDataURL('image/png').split(',')[1],alt:alt||''})})}catch(e){throw new Error('Worker URL tak pohanch nahi saka. Settings mein Worker URL ghalat hai ya Worker band hai. Usay khali kar dein aur server.js wala tareeqa use karein')}
+const j=await res.json().catch(()=>({}));if(!res.ok)throw new Error(j.error||('HTTP '+res.status));return j}
+throw new Error('LinkedIn connect nahi hai')};
+noWorker=function(){return mk('div',null,SRV&&SRV.configured?'Pehle LinkedIn connect karein:':'Seedha post ke liye LinkedIn connect hona chahiye.',mk('div',{className:'row'},mk('button',{className:'p',on:{click:connectLI}},'🔗 Connect LinkedIn'),mk('button',{on:{click:()=>openGH('profile')}},'Help')),mk('div',{className:'tip'},'Tab tak "Open in LinkedIn" button se 1 click mein post karein.'))};
+function liBadge(){let b=$('#libadge');if(!b){b=mk('button',{id:'libadge'});$('#gh').parentNode.insertBefore(b,$('#gh'))}
+if(SRV&&SRV.connected){b.textContent='✅ '+(SRV.name||'LinkedIn').split(' ')[0];b.title='LinkedIn connected. Click to disconnect';b.onclick=async()=>{if(!confirm('LinkedIn disconnect karein?'))return;await fetch('/api/linkedin/disconnect',{method:'POST',credentials:'same-origin',headers:{'X-Requested-With':'studio'}}).catch(()=>{});SRV.connected=false;liBadge()}}
+else{b.textContent='🔗 Connect LinkedIn';b.title='';b.onclick=connectLI}}
+$('#sl').onclick=connectLI;
+(async()=>{try{if(!/^https?:$/.test(location.protocol))throw 0;const r=await fetch('/api/linkedin/status',{credentials:'same-origin'});if(!r.ok)throw 0;const j=await r.json();if(typeof j.configured!=='boolean')throw 0;SRV=j}catch(e){SRV=null}liBadge();
+const q=new URLSearchParams(location.search).get('li');if(q){history.replaceState(null,'',location.pathname);add('b',q==='connected'&&SRV&&SRV.connected?'✅ LinkedIn connect ho gaya ('+(SRV.name||'')+'). Ab "Post to LinkedIn" seedha post karega.':q==='config'?'Server par LinkedIn keys set nahi (LINKEDIN_CLIENT_ID / SECRET).':'LinkedIn connect nahi hua. Redirect URL LinkedIn app mein bilkul server wale URL jaisa hona chahiye. Dobara try karein.')}
+else if(SRV&&SRV.expired)add('b',mk('div',null,'LinkedIn session khatam ho gayi (60 din ya server restart).',mk('div',{className:'row'},mk('button',{className:'p',on:{click:connectLI}},'Dobara connect karein'))))})();
+/*V5_END*/
 </script>
 </body>
 </html>

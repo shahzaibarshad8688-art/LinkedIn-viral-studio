@@ -44,7 +44,7 @@ async function publish(req,res){const s=session(req,res,false);if(!mem(s))return
  catch(e){dlog('publish failed:',e.code,e.detail||e.message);json(res,e.code==='expired'?401:502,{ok:false,code:e.code||'publish'})}}
 const server=http.createServer(async(req,res)=>{try{const u=new URL(req.url,ORIGIN),p=u.pathname;
  res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','same-origin');res.setHeader('X-Frame-Options','DENY');
- res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.licdn.com; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'");
+ res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; media-src 'self' data: blob: https:; connect-src 'self' https: blob: data: http://localhost:11434 http://127.0.0.1:11434; frame-ancestors 'none'; base-uri 'none'; form-action 'self'");
  if(req.method==='GET'&&(p==='/'||p==='/index.html')){res.writeHead(200,{'Content-Type':'text/html; charset=utf-8'});return res.end(fs.readFileSync(path.join(__dirname,'index.html')))}
  if(req.method==='GET'&&p==='/auth/linkedin'){if(!CONFIGURED){res.writeHead(302,{Location:'/?li=config'});return res.end()}const s=session(req,res,true);s.state=crypto.randomBytes(24).toString('hex');
   res.writeHead(302,{Location:'https://www.linkedin.com/oauth/v2/authorization?'+new URLSearchParams({response_type:'code',client_id:ID,redirect_uri:REDIRECT,state:s.state,scope:'openid profile w_member_social'})});return res.end()}
